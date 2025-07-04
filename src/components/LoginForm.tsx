@@ -664,5 +664,3 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 };
 
 export default LoginForm;
-
-export default LoginForm
