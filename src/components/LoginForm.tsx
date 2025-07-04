@@ -266,7 +266,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             {/* Logo and Welcome */}
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center mb-4">
-                <MapPin className="h-8 w-8 text-amber-600 mr-2" />
+                <img 
+                  src="/image.png" 
+                  alt="DesiDestinations Logo" 
+                  className="h-10 w-10 mr-3 rounded-lg shadow-lg"
+                />
                 <h1 className="text-2xl font-bold text-gray-900">DesiDestinations</h1>
               </div>
               <p className="text-gray-700 text-sm leading-relaxed">
@@ -370,11 +374,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 <div className="text-center space-y-2">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center justify-center space-x-2">
                     <LogIn className="h-5 w-5 text-blue-600" />
-                    <span>Welcome Back</span>
+                    <span>Sign In to Continue</span>
                   </h2>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                    🔐 Signing In
-                  </div>
                 </div>
                 
                 <form onSubmit={handleLogin} className="space-y-4">
