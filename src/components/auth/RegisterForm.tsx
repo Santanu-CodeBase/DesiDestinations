@@ -139,7 +139,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !name.trim() || !email.trim() || password.length < 6}
           className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-4 rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
         >
           {isLoading ? (

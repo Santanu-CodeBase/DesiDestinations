@@ -110,7 +110,6 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       }
       
       // Successful login
-      alert(`Welcome back, ${user.name}! Ready to explore India?`);
       localStorage.setItem('desiDestinationsEmail', email);
       onLogin(email);
     } catch (error) {
@@ -165,7 +164,6 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       localStorage.setItem(`desiDestinations_user_${email}`, JSON.stringify(newUser));
       localStorage.setItem('desiDestinationsEmail', email);
       
-      alert(`Welcome to DesiDestinations, ${name}! Your account has been created successfully. Let's start exploring India!`);
       onLogin(email);
     } catch (error) {
       console.error('Registration error:', error);
@@ -200,28 +198,19 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     setPhone('');
     setResetEmail('');
     setShowPassword(false);
-    // Only clear email when explicitly switching modes, not on form reset
   };
 
   const switchMode = (newMode: 'login' | 'register' | 'forgot') => {
-    // Clear form but preserve email when switching to register
-    if (newMode === 'register') {
-      setPassword('');
-      setPasswordError('');
-      setName('');
-      setPhone('');
-      setShowPassword(false);
-    } else {
-      resetForm();
-      setEmail(''); // Clear email only when not going to register
+    resetForm();
+    if (newMode !== 'register') {
+      setEmail(''); // Only clear email when not going to register
     }
     setMode(newMode);
   };
 
   const handleProceedToRegister = () => {
     setShowUserNotFound(false);
-    // Pre-fill the email in registration form
-    setEmail(email);
+    resetForm(); // Clear all form fields except email
     setMode('register');
   };
 
