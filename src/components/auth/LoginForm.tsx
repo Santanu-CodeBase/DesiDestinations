@@ -42,8 +42,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
               id="email"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
-              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm bg-white text-gray-900 placeholder-gray-500"
               placeholder="Enter your email"
+              disabled={false}
               required
             />
           </div>
