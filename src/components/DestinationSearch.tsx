@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Calendar, MapPin, Plus, X, Star } from 'lucide-react';
+import Logo from './Logo';
 import { indianDestinations } from '../data/destinations';
 import { SearchRecord } from '../types';
 
@@ -80,11 +81,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     <div className="space-y-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-          <img 
-            src="/desi-logo.png" 
-            alt="DesiDestinations Logo" 
-            className="h-6 w-6 mr-2 rounded"
-          />
+          <Logo size="sm" className="mr-2" />
           Plan Your Journey
         </h2>
 

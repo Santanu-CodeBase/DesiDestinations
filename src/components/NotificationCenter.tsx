@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Bell, Inbox, Send, Clock, Check } from 'lucide-react';
+import Logo from './Logo';
 import { NotificationItem } from '../types';
 
 interface NotificationCenterProps {
@@ -45,11 +46,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
     <div className="space-y-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-          <img 
-            src="/desi-logo.png" 
-            alt="DesiDestinations Logo" 
-            className="h-6 w-6 mr-2 rounded"
-          />
+          <Logo size="sm" className="mr-2" />
           Notifications
         </h2>
 

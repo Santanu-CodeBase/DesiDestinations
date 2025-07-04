@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Mail, ArrowRight, Lock, Eye, EyeOff, Clock, Calendar, User, Phone, UserPlus, LogIn } from 'lucide-react';
+import Logo from './Logo';
 
 interface LoginFormProps {
   onLogin: (email: string) => void;
@@ -266,11 +267,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             {/* Logo and Welcome */}
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center mb-4">
-                <img 
-                  src="/desi-logo.png" 
-                  alt="DesiDestinations Logo" 
-                  className="h-10 w-10 mr-3 rounded-lg shadow-lg"
-                />
+                <Logo size="lg" className="mr-3" />
                 <h1 className="text-2xl font-bold text-gray-900">DesiDestinations</h1>
               </div>
               <p className="text-gray-700 text-sm leading-relaxed">
