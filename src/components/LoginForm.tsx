@@ -111,7 +111,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         // Check if user already exists
         const existingUser = localStorage.getItem(`desiDestinations_${email}`);
         if (existingUser) {
-          alert('Account already exists. Please sign in instead.');
+          alert('Account already exists with this email. Please sign in instead.');
           setIsSignUp(false);
           setIsLoading(false);
           return;
@@ -120,19 +120,143 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         localStorage.setItem(`desiDestinations_${email}`, password);
         // Also store in the format the main app expects
         localStorage.setItem('desiDestinationsEmail', email);
-        alert('Account created successfully! You are now logged in.');
+        console.log('Account created successfully for:', email);
         onLogin(email);
       } else {
         // Sign in existing user
         const storedPassword = localStorage.getItem(`desiDestinations_${email}`);
+        const legacyEmail = localStorage.getItem('desiDestinationsEmail');
+        
         if (!storedPassword) {
           // Check if this is a legacy user (from the old simple email-only system)
-          const legacyEmail = localStorage.getItem('desiDestinationsEmail');
           if (legacyEmail === email) {
             // Migrate legacy user to new password system
             localStorage.setItem(`desiDestinations_${email}`, password);
-            alert('Account migrated successfully! You are now logged in.');
+            console.log('Legacy account migrated for:', email);
+            localStorage.setItem('desiDestinationsEmail', email);
             onLogin(email);
+            setIsLoading(false);
+            return;
+          }
+          
+          // For completely new users, auto-switch to sign up mode
+          console.log('New user detected, switching to sign up mode');
+          setIsSignUp(true);
+          setIsLoading(false);
+          // Show a helpful message
+          setTimeout(() => {
+            alert('No account found with this email. Please create a new account by clicking "Create Account" below.');
+          }, 100);
+          return;
+        }
+        
+        if (storedPassword !== password) {
+          alert('Incorrect password. Please try again or use "Forgot Password?"');
+          setIsLoading(false);
+          return;
+        }
+        
+        // Successful login
+        console.log('Successful login for:', email);
+        localStorage.setItem('desiDestinationsEmail', email);
+        onLogin(email);
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      alert('An error occurred during authentication. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  // Auto-create demo account for testing
+  useEffect(() => {
+    // Create a demo account for easy testing
+    const demoEmail = 'demo@desidestinations.com';
+    const demoPassword = 'demo123';
+    
+    if (!localStorage.getItem(`desiDestinations_${demoEmail}`)) {
+      localStorage.setItem(`desiDestinations_${demoEmail}`, demoPassword);
+      console.log('Demo account created: demo@desidestinations.com / demo123');
+    }
+  }, []);
+
+  const handleQuickDemo = () => {
+    setEmail('demo@desidestinations.com');
+    setPassword('demo123');
+    setIsSignUp(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
+
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    try {
+      // Handle authentication logic
+      if (isSignUp) {
+        // Check if user already exists
+        const existingUser = localStorage.getItem(`desiDestinations_${email}`);
+        if (existingUser) {
+          alert('Account already exists with this email. Please sign in instead.');
+          setIsSignUp(false);
+          setIsLoading(false);
+          return;
+        }
+        // Create new account
+        localStorage.setItem(`desiDestinations_${email}`, password);
+        // Also store in the format the main app expects
+        localStorage.setItem('desiDestinationsEmail', email);
+        console.log('Account created successfully for:', email);
+        onLogin(email);
+      } else {
+        // Sign in existing user
+        const storedPassword = localStorage.getItem(`desiDestinations_${email}`);
+        const legacyEmail = localStorage.getItem('desiDestinationsEmail');
+        
+        if (!storedPassword) {
+          // Check if this is a legacy user (from the old simple email-only system)
+          if (legacyEmail === email) {
+            // Migrate legacy user to new password system
+            localStorage.setItem(`desiDestinations_${email}`, password);
+            console.log('Legacy account migrated for:', email);
+            localStorage.setItem('desiDestinationsEmail', email);
+            onLogin(email);
+            setIsLoading(false);
+            return;
+          }
+          
+          // For completely new users, auto-switch to sign up mode
+          console.log('New user detected, switching to sign up mode');
+          setIsSignUp(true);
+          setIsLoading(false);
+          // Show a helpful message
+          setTimeout(() => {
+            alert('No account found with this email. The form has been switched to "Create Account" mode. Please click "Create Account" to proceed.');
+          }, 100);
+          return;
+        }
+        
+        if (storedPassword !== password) {
+          alert('Incorrect password. Please try again or use "Forgot Password?"');
+          setIsLoading(false);
+          return;
+        }
+        
+        // Successful login
+        console.log('Successful login for:', email);
+        localStorage.setItem('desiDestinationsEmail', email);
+        onLogin(email);
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      alert('An error occurred during authentication. Please try again.');
+    }
+    
+    setIsLoading(false);
+  };
           } else {
             alert('No account found with this email. Please sign up first.');
             setIsSignUp(true);
@@ -382,6 +506,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       {isSignUp ? 'Sign In' : 'Sign Up'}
                     </button>
                   </p>
+                  
+                  {/* Demo Account Helper */}
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 mb-2">Quick Demo:</p>
+                    <button
+                      type="button"
+                      onClick={handleQuickDemo}
+                      className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
+                    >
+                      Use Demo Account
+                    </button>
+                  </div>
                 </div>
 
                 <div className="text-center text-xs text-gray-500">
