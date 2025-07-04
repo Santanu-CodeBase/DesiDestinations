@@ -97,6 +97,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     });
   };
 
+  // Auto-create demo account for testing
+  useEffect(() => {
+    // Create a demo account for easy testing
+    const demoEmail = 'demo@desidestinations.com';
+    const demoPassword = 'demo123';
+    
+    if (!localStorage.getItem(`desiDestinations_${demoEmail}`)) {
+      localStorage.setItem(`desiDestinations_${demoEmail}`, demoPassword);
+      console.log('Demo account created: demo@desidestinations.com / demo123');
+    }
+  }, []);
+
+  const handleQuickDemo = () => {
+    setEmail('demo@desidestinations.com');
+    setPassword('demo123');
+    setIsSignUp(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
@@ -166,119 +184,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       alert('An error occurred during authentication. Please try again.');
       setIsLoading(false);
     }
-  };
-
-  // Auto-create demo account for testing
-  useEffect(() => {
-    // Create a demo account for easy testing
-    const demoEmail = 'demo@desidestinations.com';
-    const demoPassword = 'demo123';
-    
-    if (!localStorage.getItem(`desiDestinations_${demoEmail}`)) {
-      localStorage.setItem(`desiDestinations_${demoEmail}`, demoPassword);
-      console.log('Demo account created: demo@desidestinations.com / demo123');
-    }
-  }, []);
-
-  const handleQuickDemo = () => {
-    setEmail('demo@desidestinations.com');
-    setPassword('demo123');
-    setIsSignUp(false);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || !password.trim()) return;
-
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    try {
-      // Handle authentication logic
-      if (isSignUp) {
-        // Check if user already exists
-        const existingUser = localStorage.getItem(`desiDestinations_${email}`);
-        if (existingUser) {
-          alert('Account already exists with this email. Please sign in instead.');
-          setIsSignUp(false);
-          setIsLoading(false);
-          return;
-        }
-        // Create new account
-        localStorage.setItem(`desiDestinations_${email}`, password);
-        // Also store in the format the main app expects
-        localStorage.setItem('desiDestinationsEmail', email);
-        console.log('Account created successfully for:', email);
-        onLogin(email);
-      } else {
-        // Sign in existing user
-        const storedPassword = localStorage.getItem(`desiDestinations_${email}`);
-        const legacyEmail = localStorage.getItem('desiDestinationsEmail');
-        
-        if (!storedPassword) {
-          // Check if this is a legacy user (from the old simple email-only system)
-          if (legacyEmail === email) {
-            // Migrate legacy user to new password system
-            localStorage.setItem(`desiDestinations_${email}`, password);
-            console.log('Legacy account migrated for:', email);
-            localStorage.setItem('desiDestinationsEmail', email);
-            onLogin(email);
-            setIsLoading(false);
-            return;
-          }
-          
-          // For completely new users, auto-switch to sign up mode
-          console.log('New user detected, switching to sign up mode');
-          setIsSignUp(true);
-          setIsLoading(false);
-          // Show a helpful message
-          setTimeout(() => {
-            alert('No account found with this email. The form has been switched to "Create Account" mode. Please click "Create Account" to proceed.');
-          }, 100);
-          return;
-        }
-        
-        if (storedPassword !== password) {
-          alert('Incorrect password. Please try again or use "Forgot Password?"');
-          setIsLoading(false);
-          return;
-        }
-        
-        // Successful login
-        console.log('Successful login for:', email);
-        localStorage.setItem('desiDestinationsEmail', email);
-        onLogin(email);
-      }
-    } catch (error) {
-      console.error('Authentication error:', error);
-      alert('An error occurred during authentication. Please try again.');
-    }
-    
-    setIsLoading(false);
-  };
-          } else {
-            alert('No account found with this email. Please sign up first.');
-            setIsSignUp(true);
-          }
-          setIsLoading(false);
-          return;
-        }
-        if (storedPassword !== password) {
-          alert('Incorrect password. Please try again or use forgot password.');
-          setIsLoading(false);
-          return;
-        }
-        // Successful login
-        localStorage.setItem('desiDestinationsEmail', email);
-        onLogin(email);
-      }
-    } catch (error) {
-      console.error('Authentication error:', error);
-      alert('An error occurred during authentication. Please try again.');
-    }
-    
-    setIsLoading(false);
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
