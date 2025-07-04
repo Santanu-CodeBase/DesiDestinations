@@ -129,8 +129,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         // Check if user already exists
         const existingUser = localStorage.getItem(`desiDestinations_${email}`);
         if (existingUser) {
-          alert('Account already exists with this email. Please sign in instead.');
+          // Auto-switch to sign in mode for existing users
           setIsSignUp(false);
+          alert('Account already exists with this email. Switched to Sign In mode - please enter your password.');
           setIsLoading(false);
           return;
         }
@@ -138,7 +139,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         localStorage.setItem(`desiDestinations_${email}`, password);
         // Also store in the format the main app expects
         localStorage.setItem('desiDestinationsEmail', email);
-        console.log('Account created successfully for:', email);
+        alert('Account created successfully! Welcome to DesiDestinations!');
         onLogin(email);
       } else {
         // Sign in existing user
@@ -150,32 +151,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           if (legacyEmail === email) {
             // Migrate legacy user to new password system
             localStorage.setItem(`desiDestinations_${email}`, password);
-            console.log('Legacy account migrated for:', email);
+            alert('Welcome back! Your account has been updated with password protection.');
             localStorage.setItem('desiDestinationsEmail', email);
             onLogin(email);
             setIsLoading(false);
             return;
           }
           
-          // For completely new users, auto-switch to sign up mode
-          console.log('New user detected, switching to sign up mode');
+          // For completely new users, auto-switch to sign up mode with clear guidance
           setIsSignUp(true);
           setIsLoading(false);
-          // Show a helpful message
+          // Show a helpful message with clear next steps
           setTimeout(() => {
-            alert('No account found with this email. Please create a new account by clicking "Create Account" below.');
+            alert('Welcome! No account found with this email. The form has switched to "Create Account" mode. Please click "Create Account" to proceed.');
           }, 100);
           return;
         }
         
         if (storedPassword !== password) {
-          alert('Incorrect password. Please try again or use "Forgot Password?"');
+          alert('Incorrect password. Please check your password and try again, or use "Forgot Password?" if needed.');
           setIsLoading(false);
           return;
         }
         
         // Successful login
-        console.log('Successful login for:', email);
+        alert('Welcome back to DesiDestinations!');
         localStorage.setItem('desiDestinationsEmail', email);
         onLogin(email);
       }
@@ -184,6 +184,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       alert('An error occurred during authentication. Please try again.');
       setIsLoading(false);
     }
+    
+    setIsLoading(false);
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -329,6 +331,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   {isSignUp ? 'Create Account' : 'Welcome Back'}
                 </h2>
                 
+                {/* Status Indicator */}
+                <div className="text-center">
+                  <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                    isSignUp 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {isSignUp ? '✨ Creating New Account' : '🔐 Signing In'}
+                  </div>
+                </div>
+                
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -414,19 +427,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   
                   {/* Demo Account Helper */}
                   <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 mb-2">Quick Demo:</p>
+                    <p className="text-xs text-gray-500 mb-2">🚀 Quick Demo Access:</p>
                     <button
                       type="button"
                       onClick={handleQuickDemo}
-                      className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
+                      className="text-xs bg-blue-100 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-200 transition-colors font-medium"
                     >
-                      Use Demo Account
+                      🎯 Use Demo Account (demo@desidestinations.com)
                     </button>
+                    <p className="text-xs text-gray-400 mt-1">Password: demo123</p>
                   </div>
                 </div>
 
                 <div className="text-center text-xs text-gray-500">
-                  Secure login • Password protected • Start exploring instantly
+                  🔒 Secure login • 🛡️ Password protected • ⚡ Start exploring instantly
                 </div>
               </div>
             )}
