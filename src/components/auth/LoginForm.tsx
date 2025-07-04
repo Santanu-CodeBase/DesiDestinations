@@ -131,7 +131,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
             </>
           ) : (
             <>
-              <LogIn className="h-4 w-4" />
               <span>Sign In</span>
             </>
           )}
