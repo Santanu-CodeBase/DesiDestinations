@@ -8,6 +8,10 @@ interface RegisterFormProps {
   phone: string;
   showPassword: boolean;
   isLoading: boolean;
+  nameError: string;
+  emailError: string;
+  passwordError: string;
+  phoneError: string;
   onNameChange: (name: string) => void;
   onEmailChange: (email: string) => void;
   onPasswordChange: (password: string) => void;
@@ -24,6 +28,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   phone,
   showPassword,
   isLoading,
+  nameError,
+  emailError,
+  passwordError,
+  phoneError,
   onNameChange,
   onEmailChange,
   onPasswordChange,
@@ -32,6 +40,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   onSubmit,
   onSwitchToLogin
 }) => {
+  const isFormValid = name.trim().length >= 2 && 
+                     email.trim().length > 0 && 
+                     password.length >= 6 && 
+                     (!phone || /^\d{10}$/.test(phone));
+
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
       <div className="text-center space-y-2">
@@ -40,7 +53,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <span>Create Account</span>
         </h2>
         <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-          ✨ Creating New Account
+          ✨ Join the Journey
         </div>
       </div>
       
@@ -56,11 +69,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               id="name"
               value={name}
               onChange={(e) => onNameChange(e.target.value)}
-              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+              className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 outline-none transition-all text-sm ${
+                nameError 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  : 'border-gray-300 focus:ring-amber-500 focus:border-amber-500'
+              }`}
               placeholder="Enter your full name"
+              disabled={isLoading}
               required
+              autoComplete="name"
             />
           </div>
+          {nameError && (
+            <p className="text-red-500 text-sm mt-1 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {nameError}
+            </p>
+          )}
         </div>
 
         <div>
@@ -74,14 +101,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               id="email"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
-              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm bg-white text-gray-900 placeholder-gray-500 disabled:bg-white disabled:text-gray-900 disabled:opacity-100"
+              className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 outline-none transition-all text-sm ${
+                emailError 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  : 'border-gray-300 focus:ring-amber-500 focus:border-amber-500'
+              }`}
               placeholder="Enter your email"
               disabled={isLoading}
               required
               autoComplete="email"
-              style={{ backgroundColor: 'white', color: '#111827' }}
             />
           </div>
+          {emailError && (
+            <p className="text-red-500 text-sm mt-1 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {emailError}
+            </p>
+          )}
         </div>
 
         <div>
@@ -95,18 +133,33 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               id="password"
               value={password}
               onChange={(e) => onPasswordChange(e.target.value)}
-              className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+              className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 outline-none transition-all text-sm ${
+                passwordError 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  : 'border-gray-300 focus:ring-amber-500 focus:border-amber-500'
+              }`}
               placeholder="Create a password (min 6 characters)"
+              disabled={isLoading}
               required
+              autoComplete="new-password"
             />
             <button
               type="button"
               onClick={onTogglePassword}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              disabled={isLoading}
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+          {passwordError && (
+            <p className="text-red-500 text-sm mt-1 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {passwordError}
+            </p>
+          )}
           <p className="text-xs text-gray-500 mt-1">Minimum 6 characters required</p>
         </div>
 
@@ -129,21 +182,38 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   onPhoneChange(value);
                 }
               }}
-              className="w-full pl-16 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+              className={`w-full pl-16 pr-3 py-3 border rounded-lg focus:ring-2 outline-none transition-all text-sm ${
+                phoneError 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  : 'border-gray-300 focus:ring-amber-500 focus:border-amber-500'
+              }`}
               placeholder="9876543210"
+              disabled={isLoading}
               maxLength={10}
+              autoComplete="tel"
             />
           </div>
+          {phoneError && (
+            <p className="text-red-500 text-sm mt-1 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {phoneError}
+            </p>
+          )}
           <p className="text-xs text-gray-500 mt-1">10-digit mobile number without country code</p>
         </div>
 
         <button
           type="submit"
-          disabled={isLoading || !name.trim() || !email.trim() || password.length < 6}
+          disabled={isLoading || !isFormValid}
           className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-4 rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
         >
           {isLoading ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>Creating Account...</span>
+            </>
           ) : (
             <>
               <UserPlus className="h-4 w-4" />
@@ -159,6 +229,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <button
             onClick={onSwitchToLogin}
             className="ml-1 text-amber-600 hover:text-amber-700 font-medium"
+            disabled={isLoading}
           >
             Sign In
           </button>
