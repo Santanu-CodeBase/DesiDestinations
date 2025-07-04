@@ -1,21 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Mail, ArrowRight, Lock, Eye, EyeOff, Clock, Calendar } from 'lucide-react';
+import { MapPin, Mail, ArrowRight, Lock, Eye, EyeOff, Clock, Calendar, User, Phone, UserPlus, LogIn } from 'lucide-react';
 
 interface LoginFormProps {
   onLogin: (email: string) => void;
 }
 
+interface UserData {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  createdAt: string;
+}
+
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [resetEmail, setResetEmail] = useState('');
   const [resetLinkSent, setResetLinkSent] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showExcitementMessage, setShowExcitementMessage] = useState(false);
 
   // Beautiful Indian destinations and cultural images
   const indianImages = [
@@ -43,21 +53,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       url: 'https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg',
       caption: 'Goa Beaches - Coastal Paradise',
       description: 'Relax on pristine shores where golden sands meet azure waters'
-    },
-    {
-      url: 'https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg',
-      caption: 'Jaipur Palace - Royal Heritage',
-      description: 'Step into the grandeur of Rajputana architecture and royal legacy'
-    },
-    {
-      url: 'https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg',
-      caption: 'Varanasi Ghats - Spiritual Awakening',
-      description: 'Witness the eternal dance of life along the sacred Ganges'
-    },
-    {
-      url: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg',
-      caption: 'Mumbai Skyline - City of Dreams',
-      description: 'Discover where tradition meets modernity in India\'s financial capital'
     }
   ];
 
@@ -66,7 +61,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
@@ -75,7 +69,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     const imageTimer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % indianImages.length);
     }, 25000);
-
     return () => clearInterval(imageTimer);
   }, [indianImages.length]);
 
@@ -99,12 +92,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   // Auto-create demo account for testing
   useEffect(() => {
-    // Create a demo account for easy testing
-    const demoEmail = 'demo@desidestinations.com';
-    const demoPassword = 'demo123';
+    const demoUserData: UserData = {
+      name: 'Demo User',
+      email: 'demo@desidestinations.com',
+      password: 'demo123',
+      phone: '+91 9876543210',
+      createdAt: new Date().toISOString()
+    };
     
-    if (!localStorage.getItem(`desiDestinations_${demoEmail}`)) {
-      localStorage.setItem(`desiDestinations_${demoEmail}`, demoPassword);
+    if (!localStorage.getItem(`desiDestinations_user_${demoUserData.email}`)) {
+      localStorage.setItem(`desiDestinations_user_${demoUserData.email}`, JSON.stringify(demoUserData));
       console.log('Demo account created: demo@desidestinations.com / demo123');
     }
   }, []);
@@ -112,76 +109,121 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const handleQuickDemo = () => {
     setEmail('demo@desidestinations.com');
     setPassword('demo123');
-    setIsSignUp(false);
+    setMode('login');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    return password.length >= 6;
+  };
+
+  const validatePhone = (phone: string) => {
+    if (!phone) return true; // Optional field
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
 
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     try {
-      // Handle authentication logic
-      if (isSignUp) {
-        // Check if user already exists
-        const existingUser = localStorage.getItem(`desiDestinations_${email}`);
-        if (existingUser) {
-          // Auto-switch to sign in mode for existing users
-          setIsSignUp(false);
-          alert('Account already exists with this email. Switched to Sign In mode - please enter your password.');
-          setIsLoading(false);
-          return;
-        }
-        // Create new account
-        localStorage.setItem(`desiDestinations_${email}`, password);
-        // Also store in the format the main app expects
-        localStorage.setItem('desiDestinationsEmail', email);
-        alert('Account created successfully! Welcome to DesiDestinations!');
-        onLogin(email);
-      } else {
-        // Sign in existing user
-        const storedPassword = localStorage.getItem(`desiDestinations_${email}`);
-        const legacyEmail = localStorage.getItem('desiDestinationsEmail');
-        
-        if (!storedPassword) {
-          // Check if this is a legacy user (from the old simple email-only system)
-          if (legacyEmail === email) {
-            // Migrate legacy user to new password system
-            localStorage.setItem(`desiDestinations_${email}`, password);
-            alert('Welcome back! Your account has been updated with password protection.');
-            localStorage.setItem('desiDestinationsEmail', email);
-            onLogin(email);
-            setIsLoading(false);
-            return;
-          }
-          
-          // For completely new users, auto-switch to sign up mode with clear guidance
-          setIsSignUp(true);
-          setIsLoading(false);
-          // Show a helpful message with clear next steps
-          setTimeout(() => {
-            alert('Welcome! No account found with this email. The form has switched to "Create Account" mode. Please click "Create Account" to proceed.');
-          }, 100);
-          return;
-        }
-        
-        if (storedPassword !== password) {
-          alert('Incorrect password. Please check your password and try again, or use "Forgot Password?" if needed.');
-          setIsLoading(false);
-          return;
-        }
-        
-        // Successful login
-        alert('Welcome back to DesiDestinations!');
-        localStorage.setItem('desiDestinationsEmail', email);
-        onLogin(email);
+      // Check if user exists
+      const userData = localStorage.getItem(`desiDestinations_user_${email}`);
+      
+      if (!userData) {
+        // Show excitement message and switch to register mode
+        setShowExcitementMessage(true);
+        setIsLoading(false);
+        setTimeout(() => {
+          setShowExcitementMessage(false);
+          setMode('register');
+        }, 3000);
+        return;
       }
+
+      const user: UserData = JSON.parse(userData);
+      
+      if (user.password !== password) {
+        alert('Incorrect password. Please check your password and try again.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Successful login
+      alert(`Welcome back, ${user.name}! Ready to explore India?`);
+      localStorage.setItem('desiDestinationsEmail', email);
+      onLogin(email);
     } catch (error) {
-      console.error('Authentication error:', error);
-      alert('An error occurred during authentication. Please try again.');
+      console.error('Login error:', error);
+      alert('An error occurred during login. Please try again.');
+      setIsLoading(false);
+    }
+    
+    setIsLoading(false);
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !password.trim()) return;
+
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (!validatePhone(phone)) {
+      alert('Please enter a valid 10-digit phone number (without country code).');
+      return;
+    }
+
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    try {
+      // Check if user already exists
+      const existingUser = localStorage.getItem(`desiDestinations_user_${email}`);
+      if (existingUser) {
+        alert('Account already exists with this email. Please use the login form.');
+        setMode('login');
+        setIsLoading(false);
+        return;
+      }
+
+      // Create new user
+      const newUser: UserData = {
+        name: name.trim(),
+        email: email.trim(),
+        password: password,
+        phone: phone ? `+91 ${phone}` : undefined,
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem(`desiDestinations_user_${email}`, JSON.stringify(newUser));
+      localStorage.setItem('desiDestinationsEmail', email);
+      
+      alert(`Welcome to DesiDestinations, ${name}! Your account has been created successfully. Let's start exploring India!`);
+      onLogin(email);
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert('An error occurred during registration. Please try again.');
       setIsLoading(false);
     }
     
@@ -193,18 +235,30 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     if (!resetEmail.trim()) return;
 
     setIsLoading(true);
-    // Simulate sending reset link
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     setResetLinkSent(true);
     setIsLoading(false);
     
-    // Auto hide success message after 5 seconds
     setTimeout(() => {
       setResetLinkSent(false);
-      setShowForgotPassword(false);
+      setMode('login');
       setResetEmail('');
     }, 5000);
+  };
+
+  const resetForm = () => {
+    setEmail('');
+    setPassword('');
+    setName('');
+    setPhone('');
+    setResetEmail('');
+    setShowPassword(false);
+  };
+
+  const switchMode = (newMode: 'login' | 'register' | 'forgot') => {
+    resetForm();
+    setMode(newMode);
   };
 
   return (
@@ -212,7 +266,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       {/* Left Panel - Login Operations (40% width) */}
       <div className="w-2/5 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex flex-col relative">
         
-        {/* Header with Date and Clock - Single Line */}
+        {/* Header with Date and Clock */}
         <div className="w-full px-6 py-4 bg-gradient-to-r from-amber-900/95 to-orange-900/95 backdrop-blur-md border-b border-amber-300/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 text-amber-100">
@@ -228,10 +282,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           </div>
         </div>
 
-        {/* Main Content Area - Full Width Usage */}
+        {/* Main Content Area */}
         <div className="flex-1 flex flex-col justify-center px-8 py-6">
           <div className="w-full space-y-6">
-            {/* Logo and Welcome - Reduced Sizes */}
+            {/* Logo and Welcome */}
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center mb-4">
                 <MapPin className="h-8 w-8 text-amber-600 mr-2" />
@@ -245,8 +299,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
               </p>
             </div>
 
+            {/* Excitement Message */}
+            {showExcitementMessage && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 text-center space-y-4 animate-pulse">
+                <div className="text-4xl">🎉</div>
+                <h3 className="text-lg font-semibold text-blue-900">
+                  We understand you are excited to explore!
+                </h3>
+                <p className="text-blue-700 text-sm leading-relaxed">
+                  Please register using the Register link to get started and unlock amazing destinations across India.
+                </p>
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                </div>
+              </div>
+            )}
+
             {/* Forgot Password Form */}
-            {showForgotPassword ? (
+            {mode === 'forgot' && !showExcitementMessage && (
               <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
                 <div className="text-center space-y-2">
                   <h2 className="text-lg font-semibold text-gray-900">
@@ -266,16 +336,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     <p className="text-sm text-gray-600 leading-relaxed">
                       Check your email for the reset link (expires in 15 minutes)
                     </p>
-                    <button
-                      onClick={() => {
-                        setShowForgotPassword(false);
-                        setResetLinkSent(false);
-                        setResetEmail('');
-                      }}
-                      className="text-amber-600 hover:text-amber-700 font-medium text-sm"
-                    >
-                      Back to Login
-                    </button>
                   </div>
                 ) : (
                   <form onSubmit={handleForgotPassword} className="space-y-4">
@@ -315,7 +375,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     <div className="text-center">
                       <button
                         type="button"
-                        onClick={() => setShowForgotPassword(false)}
+                        onClick={() => switchMode('login')}
                         className="text-amber-600 hover:text-amber-700 font-medium text-sm"
                       >
                         Back to Login
@@ -324,25 +384,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   </form>
                 )}
               </div>
-            ) : (
-              /* Login/Signup Form */
+            )}
+
+            {/* Login Form */}
+            {mode === 'login' && !showExcitementMessage && (
               <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900 text-center">
-                  {isSignUp ? 'Create Account' : 'Welcome Back'}
-                </h2>
-                
-                {/* Status Indicator */}
-                <div className="text-center">
-                  <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    isSignUp 
-                      ? 'bg-green-100 text-green-700' 
-                      : 'bg-blue-100 text-blue-700'
-                  }`}>
-                    {isSignUp ? '✨ Creating New Account' : '🔐 Signing In'}
+                <div className="text-center space-y-2">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center justify-center space-x-2">
+                    <LogIn className="h-5 w-5 text-blue-600" />
+                    <span>Welcome Back</span>
+                  </h2>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                    🔐 Signing In
                   </div>
                 </div>
                 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address
@@ -373,7 +430,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
-                        placeholder={isSignUp ? 'Create a password' : 'Enter your password'}
+                        placeholder="Enter your password"
                         required
                       />
                       <button
@@ -386,17 +443,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     </div>
                   </div>
 
-                  {!isSignUp && (
-                    <div className="text-right">
-                      <button
-                        type="button"
-                        onClick={() => setShowForgotPassword(true)}
-                        className="text-sm text-amber-600 hover:text-amber-700 font-medium"
-                      >
-                        Forgot Password?
-                      </button>
-                    </div>
-                  )}
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => switchMode('forgot')}
+                      className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
 
                   <button
                     type="submit"
@@ -407,8 +462,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     ) : (
                       <>
-                        <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
-                        <ArrowRight className="h-4 w-4" />
+                        <LogIn className="h-4 w-4" />
+                        <span>Sign In</span>
                       </>
                     )}
                   </button>
@@ -416,12 +471,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
-                    {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                    Don't have an account?
                     <button
-                      onClick={() => setIsSignUp(!isSignUp)}
+                      onClick={() => switchMode('register')}
                       className="ml-1 text-amber-600 hover:text-amber-700 font-medium"
                     >
-                      {isSignUp ? 'Sign In' : 'Sign Up'}
+                      Register
                     </button>
                   </p>
                   
@@ -433,14 +488,147 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       onClick={handleQuickDemo}
                       className="text-xs bg-blue-100 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-200 transition-colors font-medium"
                     >
-                      🎯 Use Demo Account (demo@desidestinations.com)
+                      🎯 Use Demo Account
                     </button>
-                    <p className="text-xs text-gray-400 mt-1">Password: demo123</p>
+                    <p className="text-xs text-gray-400 mt-1">demo@desidestinations.com / demo123</p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Registration Form */}
+            {mode === 'register' && !showExcitementMessage && (
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
+                <div className="text-center space-y-2">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center justify-center space-x-2">
+                    <UserPlus className="h-5 w-5 text-green-600" />
+                    <span>Create Account</span>
+                  </h2>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    ✨ Creating New Account
+                  </div>
+                </div>
+                
+                <form onSubmit={handleRegister} className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+                        placeholder="Enter your full name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+                        placeholder="Enter your email"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                      Password <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+                        placeholder="Create a password (min 6 characters)"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Minimum 6 characters required</p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number <span className="text-gray-400">(Optional)</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center">
+                        <Phone className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-600 font-medium">+91</span>
+                      </div>
+                      <input
+                        type="tel"
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          if (value.length <= 10) {
+                            setPhone(value);
+                          }
+                        }}
+                        className="w-full pl-16 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+                        placeholder="9876543210"
+                        maxLength={10}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">10-digit mobile number without country code</p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-4 rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                  >
+                    {isLoading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4" />
+                        <span>Create Account</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">
+                    Already have an account?
+                    <button
+                      onClick={() => switchMode('login')}
+                      className="ml-1 text-amber-600 hover:text-amber-700 font-medium"
+                    >
+                      Sign In
+                    </button>
+                  </p>
                 </div>
 
                 <div className="text-center text-xs text-gray-500">
-                  🔒 Secure login • 🛡️ Password protected • ⚡ Start exploring instantly
+                  🔒 Secure registration • 🛡️ Your data is protected • ⚡ Start exploring instantly
                 </div>
               </div>
             )}
@@ -472,7 +660,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         {/* Content Overlay */}
         <div className="relative h-full flex flex-col justify-between p-8">
           
-          {/* Only Image Caption Tile */}
+          {/* Image Caption Tile */}
           <div className="mt-auto">
             <div className="bg-gradient-to-r from-amber-900/90 to-orange-900/90 backdrop-blur-md rounded-2xl p-6 text-white border border-amber-300/20 shadow-2xl">
               <h3 className="text-2xl font-bold mb-3">{indianImages[currentImageIndex].caption}</h3>
