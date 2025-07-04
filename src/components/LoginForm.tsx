@@ -163,6 +163,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       
       if (!userData) {
         // User doesn't exist - show user not found dialog
+        clearErrors(); // Clear any existing errors
         setMode('userNotFound');
         setIsLoading(false);
         return;
@@ -305,7 +306,11 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
 
   // Handle proceeding to registration from user not found dialog
   const handleProceedToRegister = () => {
-    clearForm();
+    clearErrors();
+    setPassword(''); // Clear password but keep email
+    setName('');
+    setPhone('');
+    setShowPassword(false);
     // Keep the email that was entered
     setMode('register');
   };
