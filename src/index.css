@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Prevent browser autofill from graying out email fields */
+input[type="email"]:-webkit-autofill,
+input[type="email"]:-webkit-autofill:hover,
+input[type="email"]:-webkit-autofill:focus,
+input[type="email"]:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  background-color: white !important;
+  color: #111827 !important;
+}
+
+/* Ensure email fields always have proper styling */
+input[type="email"] {
+  background-color: white !important;
+  color: #111827 !important;
+}
+
+input[type="email"]:disabled {
+  background-color: white !important;
+  color: #111827 !important;
+  opacity: 1 !important;
+}
