@@ -158,41 +158,25 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     try {
-      // Debug: Log what we're looking for
-     const cleanEmail = email.trim().toLowerCase();
-     console.log('Attempting login with email:', cleanEmail);
-      
-      // Check all stored users for debugging
-      const allKeys = Object.keys(localStorage).filter(key => key.startsWith('desiDestinations_user_'));
-      console.log('All stored user keys:', allKeys);
-      
-     const userData = getUserData(cleanEmail);
-      console.log('Retrieved user data:', userData);
+      const cleanEmail = email.trim().toLowerCase();
+      const userData = getUserData(cleanEmail);
       
       if (!userData) {
         // User doesn't exist - show user not found dialog
-       console.log('User not found for email:', cleanEmail);
         setMode('userNotFound');
         setIsLoading(false);
         return;
       }
 
-      console.log('Comparing passwords:', {
-       entered: password,
-        stored: userData.password,
-       match: userData.password === password
-      });
-
-     if (userData.password !== password) {
+      if (userData.password !== password) {
         setPasswordError('Incorrect password. Please check and try again.');
         setIsLoading(false);
         return;
       }
       
       // Successful login
-      console.log('Login successful');
-     localStorage.setItem('desiDestinationsEmail', cleanEmail);
-     onLogin(cleanEmail);
+      localStorage.setItem('desiDestinationsEmail', cleanEmail);
+      onLogin(cleanEmail);
     } catch (error) {
       console.error('Login error:', error);
       setPasswordError('An error occurred during login. Please try again.');
