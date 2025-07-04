@@ -266,9 +266,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           <div className="w-full space-y-6">
             {/* Logo and Welcome */}
             <div className="text-center space-y-3">
-              <div className="flex items-center justify-center mb-4">
+              <div className="flex items-center justify-center mb-6">
                 <Logo size="lg" className="mr-3" />
-                <h1 className="text-2xl font-bold text-gray-900">DesiDestinations</h1>
+                <h1 className="text-3xl font-bold text-gray-900">DesiDestinations</h1>
               </div>
               <p className="text-gray-700 text-sm leading-relaxed">
                 Discover incredible India, one destination at a time

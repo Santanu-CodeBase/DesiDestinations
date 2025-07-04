@@ -45,9 +45,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center space-x-3">
           <Logo size="sm" className="mr-2" />
-          Notifications
+          <span>Notifications</span>
         </h2>
 
         {/* Tabs */}
