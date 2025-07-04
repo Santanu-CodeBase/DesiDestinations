@@ -101,7 +101,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || email.length < 3}
           className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 px-4 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
         >
           {isLoading ? (
