@@ -287,39 +287,39 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
             {/* User Not Found Message */}
             {showUserNotFound && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 text-center space-y-4">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="relative">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10" strokeWidth="2"/>
                         <polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88 16.24,7.76" strokeWidth="2" fill="currentColor"/>
                       </svg>
                     </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                       <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                       </svg>
                     </div>
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-blue-900">
+                <h3 className="text-lg font-semibold text-gray-900">
                   Start Your Journey
                 </h3>
-                <p className="text-blue-700 text-sm leading-relaxed">
+                <p className="text-gray-700 text-sm leading-relaxed">
                   We understand you are excited to explore. Please register using the Register link to get started.
                 </p>
                 <div className="flex space-x-3 justify-center">
                   <button
                     onClick={handleProceedToRegister}
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center space-x-2"
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all text-sm flex items-center space-x-2 shadow-md hover:shadow-lg"
                   >
                     <UserPlus className="h-4 w-4" />
                     <span>Create Account</span>
                   </button>
                   <button
                     onClick={handleStayOnLogin}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                    className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-all text-sm shadow-md hover:shadow-lg"
                   >
                     Try Again
                   </button>
