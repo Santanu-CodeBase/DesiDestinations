@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Mail, ArrowRight, Lock, Eye, EyeOff, Clock, Calendar, User, Phone, UserPlus, LogIn } from 'lucide-react';
+import React, { useState } from 'react';
 import Logo from './Logo';
+import LoginForm from './auth/LoginForm';
+import RegisterForm from './auth/RegisterForm';
+import ForgotPasswordForm from './auth/ForgotPasswordForm';
+import UserNotFoundDialog from './auth/UserNotFoundDialog';
+import ImageGallery from './auth/ImageGallery';
+import AuthHeader from './auth/AuthHeader';
 
-interface LoginFormProps {
+interface LoginFormContainerProps {
   onLogin: (email: string) => void;
 }
 
@@ -14,7 +19,7 @@ interface UserData {
   createdAt: string;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
+const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -24,8 +29,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [resetEmail, setResetEmail] = useState('');
   const [resetLinkSent, setResetLinkSent] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showUserNotFound, setShowUserNotFound] = useState(false);
   const [passwordError, setPasswordError] = useState('');
 
@@ -57,40 +60,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       description: 'Relax on pristine golden beaches where palm trees sway gently and crystal-clear waters meet the shore, creating the perfect tropical paradise'
     }
   ];
-
-  // Update clock every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Rotate images every 25 seconds
-  useEffect(() => {
-    const imageTimer = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % indianImages.length);
-    }, 25000);
-    return () => clearInterval(imageTimer);
-  }, [indianImages.length]);
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-IN', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-IN', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -258,20 +227,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       <div className="w-2/5 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex flex-col relative">
         
         {/* Header with Date and Clock */}
-        <div className="w-full px-6 py-4 bg-gradient-to-r from-amber-900/95 to-orange-900/95 backdrop-blur-md border-b border-amber-300/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 text-amber-100">
-              <Calendar className="h-3 w-3" />
-              <span className="text-xs font-semibold tracking-wide">{formatDate(currentTime)}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-3 w-3 text-amber-200" />
-              <span className="text-xs font-bold text-amber-100 font-mono tracking-wider bg-amber-800/30 px-2 py-1 rounded">
-                {formatTime(currentTime)}
-              </span>
-            </div>
-          </div>
-        </div>
+        <AuthHeader />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col justify-center px-8 py-6">
@@ -292,374 +248,61 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
             {/* User Not Found Message */}
             {showUserNotFound && (
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-200 text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="relative">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center shadow-lg" style={{background: 'linear-gradient(135deg, #FF9933 0%, #000080 100%)'}}>
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" strokeWidth="2"/>
-                        <polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88 16.24,7.76" strokeWidth="2" fill="currentColor"/>
-                      </svg>
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center shadow-md" style={{backgroundColor: '#138808'}}>
-                      <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <h3 className="text-lg font-semibold" style={{color: '#000080'}}>
-                  Start Your Journey
-                </h3>
-                <p className="text-gray-800 text-sm leading-relaxed">
-                  We understand you are excited to explore. Please register using the Register link to get started.
-                </p>
-                <div className="flex space-x-3 justify-center">
-                  <button
-                    onClick={handleProceedToRegister}
-                    className="text-white px-4 py-2 rounded-lg font-medium transition-all text-sm flex items-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105"
-                    style={{
-                      background: 'linear-gradient(135deg, #138808 0%, #228B22 100%)',
-                      boxShadow: '0 4px 15px rgba(19, 136, 8, 0.3)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #0F6B06 0%, #1F7A1F 100%)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #138808 0%, #228B22 100%)';
-                    }}
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    <span>Create Account</span>
-                  </button>
-                  <button
-                    onClick={handleStayOnLogin}
-                    className="text-white px-4 py-2 rounded-lg font-medium transition-all text-sm shadow-md hover:shadow-lg transform hover:scale-105"
-                    style={{
-                      background: 'linear-gradient(135deg, #FF9933 0%, #FF6600 100%)',
-                      boxShadow: '0 4px 15px rgba(255, 153, 51, 0.3)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #E6851F 0%, #E55A00 100%)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #FF9933 0%, #FF6600 100%)';
-                    }}
-                  >
-                    Try Again
-                  </button>
-                </div>
-              </div>
+              <UserNotFoundDialog
+                onProceedToRegister={handleProceedToRegister}
+                onStayOnLogin={handleStayOnLogin}
+              />
             )}
 
             {/* Forgot Password Form */}
             {mode === 'forgot' && !showUserNotFound && (
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
-                <div className="text-center space-y-2">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Reset Password
-                  </h2>
-                  <p className="text-gray-600 text-sm">
-                    Enter your email for a 15-minute reset link
-                  </p>
-                </div>
-                
-                {resetLinkSent ? (
-                  <div className="text-center space-y-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                      <Mail className="h-6 w-6 text-green-600" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-green-700">Reset Link Sent!</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Check your email for the reset link (expires in 15 minutes)
-                    </p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleForgotPassword} className="space-y-4">
-                    <div>
-                      <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <input
-                          type="email"
-                          id="resetEmail"
-                          value={resetEmail}
-                          onChange={(e) => setResetEmail(e.target.value)}
-                          className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
-                          placeholder="Enter your email"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 px-4 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
-                    >
-                      {isLoading ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      ) : (
-                        <>
-                          <span>Send Reset Link</span>
-                          <ArrowRight className="h-4 w-4" />
-                        </>
-                      )}
-                    </button>
-
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => switchMode('login')}
-                        className="text-amber-600 hover:text-amber-700 font-medium text-sm"
-                      >
-                        Back to Login
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
+              <ForgotPasswordForm
+                resetEmail={resetEmail}
+                resetLinkSent={resetLinkSent}
+                isLoading={isLoading}
+                onEmailChange={setResetEmail}
+                onSubmit={handleForgotPassword}
+                onBackToLogin={() => switchMode('login')}
+              />
             )}
 
             {/* Login Form */}
             {mode === 'login' && !showUserNotFound && (
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
-                        placeholder="Enter your email"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        id="password"
-                        value={password}
-                        onChange={(e) => {
-                          setPassword(e.target.value);
-                          if (passwordError) setPasswordError(''); // Clear error when user types
-                        }}
-                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 outline-none transition-all text-sm ${
-                          passwordError 
-                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
-                            : 'border-gray-300 focus:ring-amber-500 focus:border-amber-500'
-                        }`}
-                        placeholder="Enter your password"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    {passwordError && (
-                      <p className="text-red-500 text-sm mt-1 flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                        {passwordError}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="text-right">
-                    <button
-                      type="button"
-                      onClick={() => switchMode('forgot')}
-                      className="text-sm text-amber-600 hover:text-amber-700 font-medium"
-                    >
-                      Forgot Password?
-                    </button>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 px-4 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
-                  >
-                    {isLoading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <>
-                        <LogIn className="h-4 w-4" />
-                        <span>Sign In</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Don't have an account?
-                    <button
-                      onClick={() => switchMode('register')}
-                      className="ml-1 text-amber-600 hover:text-amber-700 font-medium"
-                    >
-                      Register
-                    </button>
-                  </p>
-                </div>
-              </div>
+              <LoginForm
+                email={email}
+                password={password}
+                showPassword={showPassword}
+                passwordError={passwordError}
+                isLoading={isLoading}
+                onEmailChange={setEmail}
+                onPasswordChange={(pwd) => {
+                  setPassword(pwd);
+                  if (passwordError) setPasswordError('');
+                }}
+                onTogglePassword={() => setShowPassword(!showPassword)}
+                onSubmit={handleLogin}
+                onForgotPassword={() => switchMode('forgot')}
+                onSwitchToRegister={() => switchMode('register')}
+              />
             )}
 
             {/* Registration Form */}
             {mode === 'register' && !showUserNotFound && (
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
-                <div className="text-center space-y-2">
-                  <h2 className="text-lg font-semibold text-gray-900 flex items-center justify-center space-x-2">
-                    <UserPlus className="h-5 w-5 text-green-600" />
-                    <span>Create Account</span>
-                  </h2>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                    ✨ Creating New Account
-                  </div>
-                </div>
-                
-                <form onSubmit={handleRegister} className="space-y-4">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type="text"
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
-                        placeholder="Enter your full name"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
-                        placeholder="Enter your email"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                      Password <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
-                        placeholder="Create a password (min 6 characters)"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Minimum 6 characters required</p>
-                  </div>
-
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number <span className="text-gray-400">(Optional)</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center">
-                        <Phone className="h-4 w-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-600 font-medium">+91</span>
-                      </div>
-                      <input
-                        type="tel"
-                        id="phone"
-                        value={phone}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '');
-                          if (value.length <= 10) {
-                            setPhone(value);
-                          }
-                        }}
-                        className="w-full pl-16 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
-                        placeholder="9876543210"
-                        maxLength={10}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">10-digit mobile number without country code</p>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-4 rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
-                  >
-                    {isLoading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <>
-                        <UserPlus className="h-4 w-4" />
-                        <span>Create Account</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Already have an account?
-                    <button
-                      onClick={() => switchMode('login')}
-                      className="ml-1 text-amber-600 hover:text-amber-700 font-medium"
-                    >
-                      Sign In
-                    </button>
-                  </p>
-                </div>
-
-                <div className="text-center text-xs text-gray-500">
-                  🔒 Secure registration • 🛡️ Your data is protected • ⚡ Start exploring instantly
-                </div>
-              </div>
+              <RegisterForm
+                name={name}
+                email={email}
+                password={password}
+                phone={phone}
+                showPassword={showPassword}
+                isLoading={isLoading}
+                onNameChange={setName}
+                onEmailChange={setEmail}
+                onPasswordChange={setPassword}
+                onPhoneChange={setPhone}
+                onTogglePassword={() => setShowPassword(!showPassword)}
+                onSubmit={handleRegister}
+                onSwitchToLogin={() => switchMode('login')}
+              />
             )}
 
             {/* Cultural Touch */}
@@ -674,66 +317,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       </div>
 
       {/* Right Panel - Indian Cultural Gallery (60% width) */}
-      <div className="w-3/5 relative overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-[2000ms] ease-in-out"
-          style={{
-            backgroundImage: `url(${indianImages[currentImageIndex].url})`,
-          }}
-        >
-          {/* Warmer Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-orange-800/10 to-red-900/30"></div>
-        </div>
-
-        {/* Content Overlay */}
-        <div className="relative h-full flex flex-col justify-between p-8">
-          
-          {/* Image Caption Tile */}
-          <div className="mt-auto">
-            <div className="bg-gradient-to-r from-amber-900/90 to-orange-900/90 backdrop-blur-md rounded-2xl p-6 text-white border border-amber-300/20 shadow-2xl">
-              <h3 className="text-2xl font-bold mb-3">{indianImages[currentImageIndex].caption}</h3>
-              <p className="text-base opacity-95 mb-4 leading-relaxed">
-                {indianImages[currentImageIndex].description}
-              </p>
-              
-              {/* Image Indicators */}
-              <div className="flex space-x-2">
-                {indianImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`w-3 h-3 rounded-full transition-all duration-500 ${
-                      index === currentImageIndex 
-                        ? 'bg-amber-300 scale-125 shadow-lg' 
-                        : 'bg-white/40 hover:bg-white/60'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Links with High Contrast */}
-          <div className="absolute bottom-4 left-8 right-8">
-            <div className="flex justify-end">
-              <div className="flex items-center space-x-8 text-xs">
-                <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
-                  Accessibility
-                </button>
-                <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
-                  Privacy Policy
-                </button>
-                <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
-                  Terms & Conditions
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ImageGallery images={indianImages} />
     </div>
   );
 };
 
-export default LoginForm;
+export default LoginFormContainer;
