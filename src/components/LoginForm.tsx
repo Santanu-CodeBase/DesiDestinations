@@ -20,17 +20,26 @@ interface UserData {
 }
 
 const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
+  // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  
+  // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'userNotFound'>('login');
+  
+  // Reset password state
   const [resetEmail, setResetEmail] = useState('');
   const [resetLinkSent, setResetLinkSent] = useState(false);
-  const [showUserNotFound, setShowUserNotFound] = useState(false);
+  
+  // Error states
   const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
 
   // Beautiful Indian destinations and cultural images
   const indianImages = [
@@ -61,93 +70,167 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     }
   ];
 
-  const validateEmail = (email: string) => {
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    return emailRegex.test(email.trim());
   };
 
-  const validatePassword = (password: string) => {
+  const validatePassword = (password: string): boolean => {
     return password.length >= 6;
   };
 
-  const validatePhone = (phone: string) => {
+  const validateName = (name: string): boolean => {
+    return name.trim().length >= 2;
+  };
+
+  const validatePhone = (phone: string): boolean => {
     if (!phone) return true; // Optional field
     const phoneRegex = /^\d{10}$/;
     return phoneRegex.test(phone);
   };
 
+  // Clear all errors
+  const clearErrors = () => {
+    setPasswordError('');
+    setEmailError('');
+    setNameError('');
+    setPhoneError('');
+  };
+
+  // Clear form data
+  const clearForm = () => {
+    setPassword('');
+    setName('');
+    setPhone('');
+    setShowPassword(false);
+    clearErrors();
+  };
+
+  // Check if user exists in localStorage
+  const getUserData = (email: string): UserData | null => {
+    try {
+      const userData = localStorage.getItem(`desiDestinations_user_${email.trim()}`);
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error('Error reading user data:', error);
+      return null;
+    }
+  };
+
+  // Save user data to localStorage
+  const saveUserData = (userData: UserData): boolean => {
+    try {
+      localStorage.setItem(`desiDestinations_user_${userData.email}`, JSON.stringify(userData));
+      return true;
+    } catch (error) {
+      console.error('Error saving user data:', error);
+      return false;
+    }
+  };
+
+  // Handle login form submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPasswordError(''); // Clear any previous error
+    clearErrors();
     
-    if (!email.trim() || !password.trim()) return;
-
+    // Validate inputs
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      return;
+    }
+    
     if (!validateEmail(email)) {
-      alert('Please enter a valid email address.');
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    
+    if (!password.trim()) {
+      setPasswordError('Password is required');
       return;
     }
 
     setIsLoading(true);
+    
+    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     try {
-      // Check if user exists
-      const userData = localStorage.getItem(`desiDestinations_user_${email}`);
+      const userData = getUserData(email);
       
       if (!userData) {
         // User doesn't exist - show user not found dialog
-        setShowUserNotFound(true);
+        setMode('userNotFound');
         setIsLoading(false);
         return;
       }
 
-      const user: UserData = JSON.parse(userData);
-      
-      if (user.password !== password) {
-        setPasswordError('Incorrect user id / password. Please check and try again');
+      if (userData.password !== password) {
+        setPasswordError('Incorrect password. Please check and try again.');
         setIsLoading(false);
         return;
       }
       
       // Successful login
-      localStorage.setItem('desiDestinationsEmail', email);
-      onLogin(email);
+      localStorage.setItem('desiDestinationsEmail', email.trim());
+      onLogin(email.trim());
     } catch (error) {
       console.error('Login error:', error);
-      alert('An error occurred during login. Please try again.');
+      setPasswordError('An error occurred during login. Please try again.');
     }
     
     setIsLoading(false);
   };
 
+  // Handle registration form submission
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !password.trim()) return;
+    clearErrors();
+    
+    let hasErrors = false;
 
-    if (!validateEmail(email)) {
-      alert('Please enter a valid email address.');
-      return;
+    // Validate all fields
+    if (!name.trim()) {
+      setNameError('Full name is required');
+      hasErrors = true;
+    } else if (!validateName(name)) {
+      setNameError('Name must be at least 2 characters long');
+      hasErrors = true;
     }
 
-    if (!validatePassword(password)) {
-      alert('Password must be at least 6 characters long.');
-      return;
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      hasErrors = true;
+    } else if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      hasErrors = true;
     }
 
-    if (!validatePhone(phone)) {
-      alert('Please enter a valid 10-digit phone number (without country code).');
-      return;
+    if (!password.trim()) {
+      setPasswordError('Password is required');
+      hasErrors = true;
+    } else if (!validatePassword(password)) {
+      setPasswordError('Password must be at least 6 characters long');
+      hasErrors = true;
     }
+
+    if (phone && !validatePhone(phone)) {
+      setPhoneError('Please enter a valid 10-digit phone number');
+      hasErrors = true;
+    }
+
+    if (hasErrors) return;
 
     setIsLoading(true);
+    
+    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     try {
       // Check if user already exists
-      const existingUser = localStorage.getItem(`desiDestinations_user_${email}`);
+      const existingUser = getUserData(email);
       if (existingUser) {
-        alert('Account already exists with this email. Please use the login form.');
-        setMode('login');
+        setEmailError('Account already exists with this email. Please sign in instead.');
         setIsLoading(false);
         return;
       }
@@ -161,69 +244,103 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
         createdAt: new Date().toISOString()
       };
 
-      localStorage.setItem(`desiDestinations_user_${email}`, JSON.stringify(newUser));
-      localStorage.setItem('desiDestinationsEmail', email);
-      
-      onLogin(email);
+      const saved = saveUserData(newUser);
+      if (!saved) {
+        setPasswordError('Failed to create account. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Auto-login after successful registration
+      localStorage.setItem('desiDestinationsEmail', email.trim());
+      onLogin(email.trim());
     } catch (error) {
       console.error('Registration error:', error);
-      alert('An error occurred during registration. Please try again.');
+      setPasswordError('An error occurred during registration. Please try again.');
       setIsLoading(false);
     }
     
     setIsLoading(false);
   };
 
+  // Handle forgot password form submission
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!resetEmail.trim()) return;
+    clearErrors();
+    
+    if (!resetEmail.trim()) {
+      return;
+    }
+
+    if (!validateEmail(resetEmail)) {
+      return;
+    }
 
     setIsLoading(true);
+    
+    // Simulate sending reset email
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     setResetLinkSent(true);
     setIsLoading(false);
     
+    // Auto-return to login after 5 seconds
     setTimeout(() => {
       setResetLinkSent(false);
-      setMode('login');
-      setResetEmail('');
+      switchToMode('login');
     }, 5000);
   };
 
-  const resetForm = () => {
-    setPassword('');
-    setPasswordError('');
-    setName('');
-    setPhone('');
+  // Switch between different modes
+  const switchToMode = (newMode: 'login' | 'register' | 'forgot') => {
+    clearForm();
     setResetEmail('');
-    setShowPassword(false);
-  };
-
-  const switchMode = (newMode: 'login' | 'register' | 'forgot') => {
-    resetForm();
-    if (newMode !== 'register') {
-      setEmail(''); // Only clear email when not going to register
-    }
+    setResetLinkSent(false);
     setMode(newMode);
   };
 
+  // Handle proceeding to registration from user not found dialog
   const handleProceedToRegister = () => {
-    setShowUserNotFound(false);
-    resetForm(); // Clear all form fields except email
+    clearForm();
+    // Keep the email that was entered
     setMode('register');
   };
 
+  // Handle staying on login from user not found dialog
   const handleStayOnLogin = () => {
-    setShowUserNotFound(false);
-    setPasswordError('');
+    clearErrors();
     setPassword('');
-    // Keep email so user doesn't have to retype it
+    // Keep the email that was entered
+    setMode('login');
+  };
+
+  // Handle email change with error clearing
+  const handleEmailChange = (newEmail: string) => {
+    setEmail(newEmail);
+    if (emailError) setEmailError('');
+  };
+
+  // Handle password change with error clearing
+  const handlePasswordChange = (newPassword: string) => {
+    setPassword(newPassword);
+    if (passwordError) setPasswordError('');
+  };
+
+  // Handle name change with error clearing
+  const handleNameChange = (newName: string) => {
+    setName(newName);
+    if (nameError) setNameError('');
+  };
+
+  // Handle phone change with error clearing
+  const handlePhoneChange = (newPhone: string) => {
+    setPhone(newPhone);
+    if (phoneError) setPhoneError('');
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel - Login Operations (40% width) */}
+      {/* Left Panel - Authentication Forms (40% width) */}
       <div className="w-2/5 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex flex-col relative">
         
         {/* Header with Date and Clock */}
@@ -246,8 +363,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
               </p>
             </div>
 
-            {/* User Not Found Message */}
-            {showUserNotFound && (
+            {/* User Not Found Dialog */}
+            {mode === 'userNotFound' && (
               <UserNotFoundDialog
                 onProceedToRegister={handleProceedToRegister}
                 onStayOnLogin={handleStayOnLogin}
@@ -255,39 +372,37 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
             )}
 
             {/* Forgot Password Form */}
-            {mode === 'forgot' && !showUserNotFound && (
+            {mode === 'forgot' && (
               <ForgotPasswordForm
                 resetEmail={resetEmail}
                 resetLinkSent={resetLinkSent}
                 isLoading={isLoading}
                 onEmailChange={setResetEmail}
                 onSubmit={handleForgotPassword}
-                onBackToLogin={() => switchMode('login')}
+                onBackToLogin={() => switchToMode('login')}
               />
             )}
 
             {/* Login Form */}
-            {mode === 'login' && !showUserNotFound && (
+            {mode === 'login' && (
               <LoginForm
                 email={email}
                 password={password}
                 showPassword={showPassword}
                 passwordError={passwordError}
+                emailError={emailError}
                 isLoading={isLoading}
-                onEmailChange={setEmail}
-                onPasswordChange={(pwd) => {
-                  setPassword(pwd);
-                  if (passwordError) setPasswordError('');
-                }}
+                onEmailChange={handleEmailChange}
+                onPasswordChange={handlePasswordChange}
                 onTogglePassword={() => setShowPassword(!showPassword)}
                 onSubmit={handleLogin}
-                onForgotPassword={() => switchMode('forgot')}
-                onSwitchToRegister={() => switchMode('register')}
+                onForgotPassword={() => switchToMode('forgot')}
+                onSwitchToRegister={() => switchToMode('register')}
               />
             )}
 
             {/* Registration Form */}
-            {mode === 'register' && !showUserNotFound && (
+            {mode === 'register' && (
               <RegisterForm
                 name={name}
                 email={email}
@@ -295,13 +410,17 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
                 phone={phone}
                 showPassword={showPassword}
                 isLoading={isLoading}
-                onNameChange={setName}
-                onEmailChange={setEmail}
-                onPasswordChange={setPassword}
-                onPhoneChange={setPhone}
+                nameError={nameError}
+                emailError={emailError}
+                passwordError={passwordError}
+                phoneError={phoneError}
+                onNameChange={handleNameChange}
+                onEmailChange={handleEmailChange}
+                onPasswordChange={handlePasswordChange}
+                onPhoneChange={handlePhoneChange}
                 onTogglePassword={() => setShowPassword(!showPassword)}
                 onSubmit={handleRegister}
-                onSwitchToLogin={() => switchMode('login')}
+                onSwitchToLogin={() => switchToMode('login')}
               />
             )}
 
