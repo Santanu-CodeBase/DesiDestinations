@@ -27,6 +27,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showUserNotFound, setShowUserNotFound] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   // Beautiful Indian destinations and cultural images
   const indianImages = [
@@ -108,6 +109,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError(''); // Clear any previous error
+    
     if (!email.trim() || !password.trim()) return;
 
     if (!validateEmail(email)) {
@@ -132,7 +135,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       const user: UserData = JSON.parse(userData);
       
       if (user.password !== password) {
-        alert('Incorrect password. Please check your password and try again.');
+        setPasswordError('Incorrect user id / password. Please check and try again');
         setIsLoading(false);
         return;
       }
@@ -225,6 +228,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const resetForm = () => {
     setEmail('');
     setPassword('');
+    setPasswordError('');
     setName('');
     setPhone('');
     setResetEmail('');
@@ -243,6 +247,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   const handleStayOnLogin = () => {
     setShowUserNotFound(false);
+    setPasswordError('');
     setEmail('');
     setPassword('');
   };
@@ -450,8 +455,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                         type={showPassword ? 'text' : 'password'}
                         id="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (passwordError) setPasswordError(''); // Clear error when user types
+                        }}
+                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 outline-none transition-all text-sm ${
+                          passwordError 
+                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                            : 'border-gray-300 focus:ring-amber-500 focus:border-amber-500'
+                        }`}
                         placeholder="Enter your password"
                         required
                       />
@@ -463,6 +475,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+                    {passwordError && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {passwordError}
+                      </p>
+                    )}
                   </div>
 
                   <div className="text-right">
