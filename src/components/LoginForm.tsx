@@ -17,7 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Beautiful Indian destinations and cultural images with warmer tones
+  // Beautiful Indian destinations and cultural images
   const indianImages = [
     {
       url: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg',
@@ -70,7 +70,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Rotate images every 25 seconds for reduced distraction
+  // Rotate images every 25 seconds
   useEffect(() => {
     const imageTimer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % indianImages.length);
@@ -143,221 +143,223 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Login Operations (40% width) */}
-      <div className="w-2/5 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex flex-col justify-center px-12 py-16 relative">
-        {/* Enhanced Date and Time Display - Top Right of Left Panel */}
-        <div className="absolute top-8 right-8">
-          <div className="bg-gradient-to-br from-amber-900/95 to-orange-900/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-amber-300/30">
-            <div className="text-center">
-              <div className="flex items-center justify-center space-x-2 text-amber-100 mb-2">
-                <Calendar className="h-5 w-5" />
-                <span className="text-sm font-bold tracking-wide">{formatDate(currentTime)}</span>
-              </div>
-              <div className="flex items-center justify-center space-x-2">
-                <Clock className="h-5 w-5 text-amber-200" />
-                <span className="text-xl font-black text-amber-100 font-mono tracking-widest bg-amber-800/30 px-3 py-1 rounded-lg">
-                  {formatTime(currentTime)}
-                </span>
-              </div>
+      <div className="w-2/5 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex flex-col relative">
+        
+        {/* Header with Date and Clock - Single Line */}
+        <div className="w-full px-6 py-4 bg-gradient-to-r from-amber-900/95 to-orange-900/95 backdrop-blur-md border-b border-amber-300/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3 text-amber-100">
+              <Calendar className="h-3 w-3" />
+              <span className="text-xs font-semibold tracking-wide">{formatDate(currentTime)}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="h-3 w-3 text-amber-200" />
+              <span className="text-xs font-bold text-amber-100 font-mono tracking-wider bg-amber-800/30 px-2 py-1 rounded">
+                {formatTime(currentTime)}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="max-w-lg mx-auto w-full space-y-8">
-          {/* Logo and Welcome */}
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center mb-6">
-              <MapPin className="h-12 w-12 text-amber-600 mr-3" />
-              <h1 className="text-3xl font-bold text-gray-900">DesiDestinations</h1>
-            </div>
-            <p className="text-gray-700 text-base leading-relaxed">
-              Discover incredible India, one destination at a time
-            </p>
-            <p className="text-base text-amber-700 font-semibold">
-              आपका स्वागत है! Welcome to your travel companion
-            </p>
-          </div>
-
-          {/* Forgot Password Form */}
-          {showForgotPassword ? (
-            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-amber-100 space-y-6">
-              <div className="text-center space-y-3">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  Reset Password
-                </h2>
-                <p className="text-gray-600 text-base">
-                  Enter your email for a 15-minute reset link
-                </p>
+        {/* Main Content Area - Full Width Usage */}
+        <div className="flex-1 flex flex-col justify-center px-8 py-6">
+          <div className="w-full space-y-6">
+            {/* Logo and Welcome - Reduced Sizes */}
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center mb-4">
+                <MapPin className="h-8 w-8 text-amber-600 mr-2" />
+                <h1 className="text-2xl font-bold text-gray-900">DesiDestinations</h1>
               </div>
-              
-              {resetLinkSent ? (
-                <div className="text-center space-y-6">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                    <Mail className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-green-700">Reset Link Sent!</h3>
-                  <p className="text-base text-gray-600 leading-relaxed">
-                    Check your email for the reset link (expires in 15 minutes)
+              <p className="text-gray-700 text-sm leading-relaxed">
+                Discover incredible India, one destination at a time
+              </p>
+              <p className="text-sm text-amber-700 font-medium">
+                आपका स्वागत है! Welcome to your travel companion
+              </p>
+            </div>
+
+            {/* Forgot Password Form */}
+            {showForgotPassword ? (
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
+                <div className="text-center space-y-2">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Reset Password
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Enter your email for a 15-minute reset link
                   </p>
-                  <button
-                    onClick={() => {
-                      setShowForgotPassword(false);
-                      setResetLinkSent(false);
-                      setResetEmail('');
-                    }}
-                    className="text-amber-600 hover:text-amber-700 font-semibold text-base"
-                  >
-                    Back to Login
-                  </button>
                 </div>
-              ) : (
-                <form onSubmit={handleForgotPassword} className="space-y-6">
+                
+                {resetLinkSent ? (
+                  <div className="text-center space-y-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                      <Mail className="h-6 w-6 text-green-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-green-700">Reset Link Sent!</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Check your email for the reset link (expires in 15 minutes)
+                    </p>
+                    <button
+                      onClick={() => {
+                        setShowForgotPassword(false);
+                        setResetLinkSent(false);
+                        setResetEmail('');
+                      }}
+                      className="text-amber-600 hover:text-amber-700 font-medium text-sm"
+                    >
+                      Back to Login
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div>
+                      <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <input
+                          type="email"
+                          id="resetEmail"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+                          placeholder="Enter your email"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 px-4 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
+                    >
+                      {isLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      ) : (
+                        <>
+                          <span>Send Reset Link</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(false)}
+                        className="text-amber-600 hover:text-amber-700 font-medium text-sm"
+                      >
+                        Back to Login
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            ) : (
+              /* Login/Signup Form */
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
+                <h2 className="text-lg font-semibold text-gray-900 text-center">
+                  {isSignUp ? 'Create Account' : 'Welcome Back'}
+                </h2>
+                
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="resetEmail" className="block text-base font-medium text-gray-700 mb-3">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <input
                         type="email"
-                        id="resetEmail"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-base"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
                         placeholder="Enter your email"
                         required
                       />
                     </div>
                   </div>
 
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-sm"
+                        placeholder={isSignUp ? 'Create a password' : 'Enter your password'}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {!isSignUp && (
+                    <div className="text-right">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 px-6 rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 text-base"
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 px-4 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm"
                   >
                     {isLoading ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     ) : (
                       <>
-                        <span>Send Reset Link</span>
-                        <ArrowRight className="h-5 w-5" />
+                        <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
+                        <ArrowRight className="h-4 w-4" />
                       </>
                     )}
                   </button>
-
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      onClick={() => setShowForgotPassword(false)}
-                      className="text-amber-600 hover:text-amber-700 font-semibold text-base"
-                    >
-                      Back to Login
-                    </button>
-                  </div>
                 </form>
-              )}
-            </div>
-          ) : (
-            /* Login/Signup Form */
-            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-amber-100 space-y-6">
-              <h2 className="text-2xl font-semibold text-gray-900 text-center">
-                {isSignUp ? 'Create Account' : 'Welcome Back'}
-              </h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="email" className="block text-base font-medium text-gray-700 mb-3">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-base"
-                      placeholder="Enter your email"
-                      required
-                    />
-                  </div>
+
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">
+                    {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                    <button
+                      onClick={() => setIsSignUp(!isSignUp)}
+                      className="ml-1 text-amber-600 hover:text-amber-700 font-medium"
+                    >
+                      {isSignUp ? 'Sign In' : 'Sign Up'}
+                    </button>
+                  </p>
                 </div>
 
-                <div>
-                  <label htmlFor="password" className="block text-base font-medium text-gray-700 mb-3">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-14 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-base"
-                      placeholder={isSignUp ? 'Create a password' : 'Enter your password'}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
+                <div className="text-center text-xs text-gray-500">
+                  Secure login • Password protected • Start exploring instantly
                 </div>
-
-                {!isSignUp && (
-                  <div className="text-right">
-                    <button
-                      type="button"
-                      onClick={() => setShowForgotPassword(true)}
-                      className="text-base text-amber-600 hover:text-amber-700 font-semibold"
-                    >
-                      Forgot Password?
-                    </button>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 px-6 rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 text-base"
-                >
-                  {isLoading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  ) : (
-                    <>
-                      <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
-                      <ArrowRight className="h-5 w-5" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <div className="text-center">
-                <p className="text-base text-gray-600">
-                  {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-                  <button
-                    onClick={() => setIsSignUp(!isSignUp)}
-                    className="ml-2 text-amber-600 hover:text-amber-700 font-semibold"
-                  >
-                    {isSignUp ? 'Sign In' : 'Sign Up'}
-                  </button>
-                </p>
               </div>
+            )}
 
-              <div className="text-center text-sm text-gray-500">
-                Secure login • Password protected • Start exploring instantly
+            {/* Cultural Touch */}
+            <div className="text-center">
+              <div className="flex items-center justify-center space-x-3 text-xs text-gray-600">
+                <span className="bg-amber-100 px-3 py-1 rounded-full font-medium">🇮🇳 Made in India</span>
+                <span className="bg-green-100 px-3 py-1 rounded-full font-medium">🏛️ Incredible India</span>
               </div>
-            </div>
-          )}
-
-          {/* Cultural Touch */}
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
-              <span className="bg-amber-100 px-4 py-2 rounded-full font-medium">🇮🇳 Made in India</span>
-              <span className="bg-green-100 px-4 py-2 rounded-full font-medium">🏛️ Incredible India</span>
             </div>
           </div>
         </div>
@@ -377,44 +379,50 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         </div>
 
         {/* Content Overlay */}
-        <div className="relative h-full flex flex-col justify-end p-16">
-          {/* Image Caption */}
-          <div className="bg-gradient-to-r from-amber-900/80 to-orange-900/80 backdrop-blur-md rounded-3xl p-8 text-white border border-amber-300/20">
-            <h3 className="text-3xl font-bold mb-4">{indianImages[currentImageIndex].caption}</h3>
-            <p className="text-lg opacity-95 mb-6 leading-relaxed">
-              {indianImages[currentImageIndex].description}
-            </p>
-            
-            {/* Image Indicators */}
-            <div className="flex space-x-3">
-              {indianImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`w-4 h-4 rounded-full transition-all duration-500 ${
-                    index === currentImageIndex 
-                      ? 'bg-amber-300 scale-125 shadow-lg' 
-                      : 'bg-white/40 hover:bg-white/60'
-                  }`}
-                />
-              ))}
+        <div className="relative h-full flex flex-col justify-between p-8">
+          
+          {/* Only Image Caption Tile */}
+          <div className="mt-auto">
+            <div className="bg-gradient-to-r from-amber-900/90 to-orange-900/90 backdrop-blur-md rounded-2xl p-6 text-white border border-amber-300/20 shadow-2xl">
+              <h3 className="text-2xl font-bold mb-3">{indianImages[currentImageIndex].caption}</h3>
+              <p className="text-base opacity-95 mb-4 leading-relaxed">
+                {indianImages[currentImageIndex].description}
+              </p>
+              
+              {/* Image Indicators */}
+              <div className="flex space-x-2">
+                {indianImages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-500 ${
+                      index === currentImageIndex 
+                        ? 'bg-amber-300 scale-125 shadow-lg' 
+                        : 'bg-white/40 hover:bg-white/60'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Floating Cultural Elements with warmer styling */}
-          <div className="absolute top-12 left-12 bg-gradient-to-br from-amber-800/30 to-orange-800/30 backdrop-blur-md rounded-2xl p-6 text-white border border-amber-300/20">
-            <div className="text-3xl mb-3">🕉️</div>
-            <p className="text-base font-semibold">Spiritual Journey</p>
-          </div>
-
-          <div className="absolute top-12 right-12 bg-gradient-to-br from-amber-800/30 to-orange-800/30 backdrop-blur-md rounded-2xl p-6 text-white border border-amber-300/20">
-            <div className="text-3xl mb-3">🏛️</div>
-            <p className="text-base font-semibold">Rich Heritage</p>
-          </div>
-
-          <div className="absolute bottom-40 right-12 bg-gradient-to-br from-amber-800/30 to-orange-800/30 backdrop-blur-md rounded-2xl p-6 text-white border border-amber-300/20">
-            <div className="text-3xl mb-3">🌄</div>
-            <p className="text-base font-semibold">Natural Beauty</p>
+          {/* Footer Links with High Contrast */}
+          <div className="absolute bottom-4 left-8 right-8">
+            <div className="bg-gradient-to-r from-gray-900/95 to-black/95 backdrop-blur-md rounded-xl p-4 border border-white/20">
+              <div className="flex items-center justify-center space-x-6 text-xs">
+                <button className="text-white hover:text-amber-300 font-medium transition-colors border-b border-transparent hover:border-amber-300 pb-1">
+                  Accessibility
+                </button>
+                <span className="text-white/40">|</span>
+                <button className="text-white hover:text-amber-300 font-medium transition-colors border-b border-transparent hover:border-amber-300 pb-1">
+                  Privacy Policy
+                </button>
+                <span className="text-white/40">|</span>
+                <button className="text-white hover:text-amber-300 font-medium transition-colors border-b border-transparent hover:border-amber-300 pb-1">
+                  Terms & Conditions
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
