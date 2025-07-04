@@ -90,28 +90,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     });
   };
 
-  // Auto-create demo account for testing
-  useEffect(() => {
-    const demoUserData: UserData = {
-      name: 'Demo User',
-      email: 'demo@desidestinations.com',
-      password: 'demo123',
-      phone: '+91 9876543210',
-      createdAt: new Date().toISOString()
-    };
-    
-    if (!localStorage.getItem(`desiDestinations_user_${demoUserData.email}`)) {
-      localStorage.setItem(`desiDestinations_user_${demoUserData.email}`, JSON.stringify(demoUserData));
-      console.log('Demo account created: demo@desidestinations.com / demo123');
-    }
-  }, []);
-
-  const handleQuickDemo = () => {
-    setEmail('demo@desidestinations.com');
-    setPassword('demo123');
-    setMode('login');
-  };
-
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -479,19 +457,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       Register
                     </button>
                   </p>
-                  
-                  {/* Demo Account Helper */}
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 mb-2">🚀 Quick Demo Access:</p>
-                    <button
-                      type="button"
-                      onClick={handleQuickDemo}
-                      className="text-xs bg-blue-100 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-200 transition-colors font-medium"
-                    >
-                      🎯 Use Demo Account
-                    </button>
-                    <p className="text-xs text-gray-400 mt-1">demo@desidestinations.com / demo123</p>
-                  </div>
                 </div>
               </div>
             )}
