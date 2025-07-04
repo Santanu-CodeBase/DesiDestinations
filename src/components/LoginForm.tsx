@@ -105,13 +105,30 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Store credentials in localStorage (in production, use proper authentication)
+    // Handle authentication logic
     if (isSignUp) {
+      // Check if user already exists
+      const existingUser = localStorage.getItem(`desiDestinations_${email}`);
+      if (existingUser) {
+        alert('Account already exists. Please sign in instead.');
+        setIsSignUp(false);
+        setIsLoading(false);
+        return;
+      }
+      // Create new account
       localStorage.setItem(`desiDestinations_${email}`, password);
+      alert('Account created successfully! You are now logged in.');
     } else {
+      // Sign in existing user
       const storedPassword = localStorage.getItem(`desiDestinations_${email}`);
+      if (!storedPassword) {
+        alert('No account found with this email. Please sign up first.');
+        setIsSignUp(true);
+        setIsLoading(false);
+        return;
+      }
       if (storedPassword !== password) {
-        alert('Invalid email or password');
+        alert('Incorrect password. Please try again or use forgot password.');
         setIsLoading(false);
         return;
       }
