@@ -26,7 +26,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [resetLinkSent, setResetLinkSent] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showExcitementMessage, setShowExcitementMessage] = useState(false);
+  const [showUserNotFound, setShowUserNotFound] = useState(false);
 
   // Beautiful Indian destinations and cultural images
   const indianImages = [
@@ -123,13 +123,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       const userData = localStorage.getItem(`desiDestinations_user_${email}`);
       
       if (!userData) {
-        // Show excitement message and switch to register mode
-        setShowExcitementMessage(true);
+        // Show user not found message with consent options
+        setShowUserNotFound(true);
         setIsLoading(false);
-        setTimeout(() => {
-          setShowExcitementMessage(false);
-          setMode('register');
-        }, 3000);
         return;
       }
 
@@ -240,6 +236,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setMode(newMode);
   };
 
+  const handleProceedToRegister = () => {
+    setShowUserNotFound(false);
+    setMode('register');
+  };
+
+  const handleStayOnLogin = () => {
+    setShowUserNotFound(false);
+    setEmail('');
+    setPassword('');
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Login Operations (40% width) */}
@@ -278,24 +285,36 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
               </p>
             </div>
 
-            {/* Excitement Message */}
-            {showExcitementMessage && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 text-center space-y-4 animate-pulse">
-                <div className="text-4xl">🎉</div>
+            {/* User Not Found Message */}
+            {showUserNotFound && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 text-center space-y-4">
+                <div className="text-4xl">🤔</div>
                 <h3 className="text-lg font-semibold text-blue-900">
-                  We understand you are excited to explore!
+                  Account Not Found
                 </h3>
                 <p className="text-blue-700 text-sm leading-relaxed">
-                  Please register using the Register link to get started and unlock amazing destinations across India.
+                  We couldn't find an account with this email address. Would you like to create a new account to start exploring India?
                 </p>
-                <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div className="flex space-x-3 justify-center">
+                  <button
+                    onClick={handleProceedToRegister}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center space-x-2"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    <span>Create Account</span>
+                  </button>
+                  <button
+                    onClick={handleStayOnLogin}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                  >
+                    Try Again
+                  </button>
                 </div>
               </div>
             )}
 
             {/* Forgot Password Form */}
-            {mode === 'forgot' && !showExcitementMessage && (
+            {mode === 'forgot' && !showUserNotFound && (
               <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
                 <div className="text-center space-y-2">
                   <h2 className="text-lg font-semibold text-gray-900">
@@ -366,7 +385,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             )}
 
             {/* Login Form */}
-            {mode === 'login' && !showExcitementMessage && (
+            {mode === 'login' && !showUserNotFound && (
               <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
@@ -453,7 +472,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             )}
 
             {/* Registration Form */}
-            {mode === 'register' && !showExcitementMessage && (
+            {mode === 'register' && !showUserNotFound && (
               <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
                 <div className="text-center space-y-2">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center justify-center space-x-2">
