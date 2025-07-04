@@ -41,6 +41,20 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
+  // Clear specific problematic email on component mount
+  React.useEffect(() => {
+    const problematicEmail = 'susmita.work@gmail.com';
+    const cleanEmail = problematicEmail.toLowerCase();
+    
+    // Remove any stored data for this specific email
+    localStorage.removeItem(`desiDestinations_user_${cleanEmail}`);
+    
+    // If this email is currently set as logged in, clear it
+    const currentLoggedEmail = localStorage.getItem('desiDestinationsEmail');
+    if (currentLoggedEmail && currentLoggedEmail.toLowerCase() === cleanEmail) {
+      localStorage.removeItem('desiDestinationsEmail');
+    }
+  }, []);
   // Beautiful Indian destinations and cultural images
   const indianImages = [
     {
