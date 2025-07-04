@@ -288,9 +288,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             {/* User Not Found Message */}
             {showUserNotFound && (
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 text-center space-y-4">
-                <div className="text-4xl">🤔</div>
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                        <polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88 16.24,7.76" strokeWidth="2" fill="currentColor"/>
+                      </svg>
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                      <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
                 <h3 className="text-lg font-semibold text-blue-900">
-                  Account Not Found
+                  Start Your Journey
                 </h3>
                 <p className="text-blue-700 text-sm leading-relaxed">
                   We understand you are excited to explore. Please register using the Register link to get started.
