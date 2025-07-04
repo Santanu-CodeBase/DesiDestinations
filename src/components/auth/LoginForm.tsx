@@ -32,6 +32,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 space-y-4">
+      <div className="text-center space-y-2">
+        <h2 className="text-lg font-semibold text-gray-900 flex items-center justify-center space-x-2">
+          <LogIn className="h-5 w-5 text-amber-600" />
+          <span>Welcome Back</span>
+        </h2>
+        <p className="text-sm text-gray-600">Sign in to continue your journey</p>
+      </div>
+
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
