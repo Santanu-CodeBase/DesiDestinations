@@ -110,7 +110,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   // Check if user exists in localStorage
   const getUserData = (email: string): UserData | null => {
     try {
-      const userData = localStorage.getItem(`desiDestinations_user_${email.trim()}`);
+      const cleanEmail = email.trim().toLowerCase();
+      const userData = localStorage.getItem(`desiDestinations_user_${cleanEmail}`);
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
       console.error('Error reading user data:', error);
@@ -121,7 +122,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   // Save user data to localStorage
   const saveUserData = (userData: UserData): boolean => {
     try {
-      localStorage.setItem(`desiDestinations_user_${userData.email}`, JSON.stringify(userData));
+      const cleanEmail = userData.email.trim().toLowerCase();
+      localStorage.setItem(`desiDestinations_user_${cleanEmail}`, JSON.stringify(userData));
       return true;
     } catch (error) {
       console.error('Error saving user data:', error);
@@ -157,30 +159,31 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     
     try {
       // Debug: Log what we're looking for
-      console.log('Attempting login with email:', email.trim());
+     const cleanEmail = email.trim().toLowerCase();
+     console.log('Attempting login with email:', cleanEmail);
       
       // Check all stored users for debugging
       const allKeys = Object.keys(localStorage).filter(key => key.startsWith('desiDestinations_user_'));
       console.log('All stored user keys:', allKeys);
       
-      const userData = getUserData(email.trim());
+     const userData = getUserData(cleanEmail);
       console.log('Retrieved user data:', userData);
       
       if (!userData) {
         // User doesn't exist - show user not found dialog
-        console.log('User not found for email:', email.trim());
+       console.log('User not found for email:', cleanEmail);
         setMode('userNotFound');
         setIsLoading(false);
         return;
       }
 
       console.log('Comparing passwords:', {
-        entered: password.trim(),
+       entered: password,
         stored: userData.password,
-        match: userData.password === password.trim()
+       match: userData.password === password
       });
 
-      if (userData.password !== password.trim()) {
+     if (userData.password !== password) {
         setPasswordError('Incorrect password. Please check and try again.');
         setIsLoading(false);
         return;
@@ -188,8 +191,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       
       // Successful login
       console.log('Login successful');
-      localStorage.setItem('desiDestinationsEmail', email.trim());
-      onLogin(email.trim());
+     localStorage.setItem('desiDestinationsEmail', cleanEmail);
+     onLogin(cleanEmail);
     } catch (error) {
       console.error('Login error:', error);
       setPasswordError('An error occurred during login. Please try again.');
@@ -244,7 +247,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     
     try {
       // Check if user already exists
-      const existingUser = getUserData(email.trim());
+     const cleanEmail = email.trim().toLowerCase();
+     const existingUser = getUserData(cleanEmail);
       if (existingUser) {
         setEmailError('Account already exists with this email. Please sign in instead.');
         setIsLoading(false);
@@ -254,8 +258,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       // Create new user
       const newUser: UserData = {
         name: name.trim(),
-        email: email.trim(),
-        password: password.trim(),
+       email: cleanEmail,
+       password: password,
         phone: phone ? `+91 ${phone}` : undefined,
         createdAt: new Date().toISOString()
       };
@@ -271,8 +275,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       }
 
       // Auto-login after successful registration
-      localStorage.setItem('desiDestinationsEmail', email.trim());
-      onLogin(email.trim());
+     localStorage.setItem('desiDestinationsEmail', cleanEmail);
+     onLogin(cleanEmail);
     } catch (error) {
       console.error('Registration error:', error);
       setPasswordError('An error occurred during registration. Please try again.');
