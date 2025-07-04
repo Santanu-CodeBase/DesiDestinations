@@ -408,17 +408,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
           {/* Footer Links with High Contrast */}
           <div className="absolute bottom-4 left-8 right-8">
-            <div className="bg-gradient-to-r from-gray-900/95 to-black/95 backdrop-blur-md rounded-xl p-4 border border-white/20">
-              <div className="flex items-center justify-center space-x-6 text-xs">
-                <button className="text-white hover:text-amber-300 font-medium transition-colors border-b border-transparent hover:border-amber-300 pb-1">
+            <div className="flex justify-end">
+              <div className="flex items-center space-x-8 text-xs">
+                <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
                   Accessibility
                 </button>
-                <span className="text-white/40">|</span>
-                <button className="text-white hover:text-amber-300 font-medium transition-colors border-b border-transparent hover:border-amber-300 pb-1">
+                <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
                   Privacy Policy
                 </button>
-                <span className="text-white/40">|</span>
-                <button className="text-white hover:text-amber-300 font-medium transition-colors border-b border-transparent hover:border-amber-300 pb-1">
+                <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
                   Terms & Conditions
                 </button>
               </div>
