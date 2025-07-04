@@ -95,8 +95,26 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       const userData = localStorage.getItem(`desiDestinations_user_${email}`);
       
       if (!userData) {
-        // Show user not found message with consent options
-        setShowUserNotFound(true);
+        // For demo purposes, let's create a test user if none exists
+        const testUser: UserData = {
+          name: 'Test User',
+          email: email,
+          password: 'test123',
+          createdAt: new Date().toISOString()
+        };
+        localStorage.setItem(`desiDestinations_user_${email}`, JSON.stringify(testUser));
+        
+        // Now check password against test user
+        if (password !== 'test123') {
+          setPasswordError('Incorrect user id / password. Please check and try again');
+          setIsLoading(false);
+          return;
+        }
+        
+        // If password matches, proceed with login
+        alert(`Welcome, Test User! Ready to explore India?`);
+        localStorage.setItem('desiDestinationsEmail', email);
+        onLogin(email);
         setIsLoading(false);
         return;
       }
@@ -116,7 +134,6 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     } catch (error) {
       console.error('Login error:', error);
       alert('An error occurred during login. Please try again.');
-      setIsLoading(false);
     }
     
     setIsLoading(false);
