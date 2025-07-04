@@ -2,25 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent browser autofill from graying out email fields */
+/* Comprehensive browser autofill styling fixes */
 input[type="email"]:-webkit-autofill,
 input[type="email"]:-webkit-autofill:hover,
 input[type="email"]:-webkit-autofill:focus,
-input[type="email"]:-webkit-autofill:active {
+input[type="email"]:-webkit-autofill:active,
+input[type="password"]:-webkit-autofill,
+input[type="password"]:-webkit-autofill:hover,
+input[type="password"]:-webkit-autofill:focus,
+input[type="password"]:-webkit-autofill:active,
+input[type="text"]:-webkit-autofill,
+input[type="text"]:-webkit-autofill:hover,
+input[type="text"]:-webkit-autofill:focus,
+input[type="text"]:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px white inset !important;
   -webkit-text-fill-color: #111827 !important;
   background-color: white !important;
   color: #111827 !important;
+  transition: background-color 5000s ease-in-out 0s !important;
 }
 
-/* Ensure email fields always have proper styling */
-input[type="email"] {
+/* Force white background for all input fields */
+input[type="email"],
+input[type="password"],
+input[type="text"],
+input[type="tel"] {
   background-color: white !important;
   color: #111827 !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
 }
 
-input[type="email"]:disabled {
+/* Disabled state styling */
+input[type="email"]:disabled,
+input[type="password"]:disabled,
+input[type="text"]:disabled,
+input[type="tel"]:disabled {
   background-color: white !important;
   color: #111827 !important;
   opacity: 1 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* Firefox autofill styling */
+input:-moz-autofill {
+  background-color: white !important;
+  color: #111827 !important;
+  box-shadow: 0 0 0 30px white inset !important;
+}
+
+/* Additional browser compatibility */
+input:autofill,
+input:-webkit-autofill {
+  background-color: white !important;
+  background-image: none !important;
+  color: #111827 !important;
+}
+
+/* Prevent any background color changes on focus/blur */
+input:focus,
+input:active,
+input:hover {
+  background-color: white !important;
+  color: #111827 !important;
 }
