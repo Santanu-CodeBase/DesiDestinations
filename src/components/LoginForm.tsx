@@ -105,36 +105,55 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Handle authentication logic
-    if (isSignUp) {
-      // Check if user already exists
-      const existingUser = localStorage.getItem(`desiDestinations_${email}`);
-      if (existingUser) {
-        alert('Account already exists. Please sign in instead.');
-        setIsSignUp(false);
-        setIsLoading(false);
-        return;
+    try {
+      // Handle authentication logic
+      if (isSignUp) {
+        // Check if user already exists
+        const existingUser = localStorage.getItem(`desiDestinations_${email}`);
+        if (existingUser) {
+          alert('Account already exists. Please sign in instead.');
+          setIsSignUp(false);
+          setIsLoading(false);
+          return;
+        }
+        // Create new account
+        localStorage.setItem(`desiDestinations_${email}`, password);
+        // Also store in the format the main app expects
+        localStorage.setItem('desiDestinationsEmail', email);
+        alert('Account created successfully! You are now logged in.');
+        onLogin(email);
+      } else {
+        // Sign in existing user
+        const storedPassword = localStorage.getItem(`desiDestinations_${email}`);
+        if (!storedPassword) {
+          // Check if this is a legacy user (from the old simple email-only system)
+          const legacyEmail = localStorage.getItem('desiDestinationsEmail');
+          if (legacyEmail === email) {
+            // Migrate legacy user to new password system
+            localStorage.setItem(`desiDestinations_${email}`, password);
+            alert('Account migrated successfully! You are now logged in.');
+            onLogin(email);
+          } else {
+            alert('No account found with this email. Please sign up first.');
+            setIsSignUp(true);
+          }
+          setIsLoading(false);
+          return;
+        }
+        if (storedPassword !== password) {
+          alert('Incorrect password. Please try again or use forgot password.');
+          setIsLoading(false);
+          return;
+        }
+        // Successful login
+        localStorage.setItem('desiDestinationsEmail', email);
+        onLogin(email);
       }
-      // Create new account
-      localStorage.setItem(`desiDestinations_${email}`, password);
-      alert('Account created successfully! You are now logged in.');
-    } else {
-      // Sign in existing user
-      const storedPassword = localStorage.getItem(`desiDestinations_${email}`);
-      if (!storedPassword) {
-        alert('No account found with this email. Please sign up first.');
-        setIsSignUp(true);
-        setIsLoading(false);
-        return;
-      }
-      if (storedPassword !== password) {
-        alert('Incorrect password. Please try again or use forgot password.');
-        setIsLoading(false);
-        return;
-      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      alert('An error occurred during authentication. Please try again.');
     }
     
-    onLogin(email);
     setIsLoading(false);
   };
 
