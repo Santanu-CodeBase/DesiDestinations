@@ -116,6 +116,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     } catch (error) {
       console.error('Login error:', error);
       alert('An error occurred during login. Please try again.');
+      setIsLoading(false);
     }
     
     setIsLoading(false);
