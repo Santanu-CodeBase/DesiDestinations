@@ -95,26 +95,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       const userData = localStorage.getItem(`desiDestinations_user_${email}`);
       
       if (!userData) {
-        // For demo purposes, let's create a test user if none exists
-        const testUser: UserData = {
-          name: 'Test User',
-          email: email,
-          password: 'test123',
-          createdAt: new Date().toISOString()
-        };
-        localStorage.setItem(`desiDestinations_user_${email}`, JSON.stringify(testUser));
-        
-        // Now check password against test user
-        if (password !== 'test123') {
-          setPasswordError('Incorrect user id / password. Please check and try again');
-          setIsLoading(false);
-          return;
-        }
-        
-        // If password matches, proceed with login
-        alert(`Welcome, Test User! Ready to explore India?`);
-        localStorage.setItem('desiDestinationsEmail', email);
-        onLogin(email);
+        // User doesn't exist - show user not found dialog
+        setShowUserNotFound(true);
         setIsLoading(false);
         return;
       }
@@ -212,30 +194,42 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   };
 
   const resetForm = () => {
-    setEmail('');
     setPassword('');
     setPasswordError('');
     setName('');
     setPhone('');
     setResetEmail('');
     setShowPassword(false);
+    // Only clear email when explicitly switching modes, not on form reset
   };
 
   const switchMode = (newMode: 'login' | 'register' | 'forgot') => {
-    resetForm();
+    // Clear form but preserve email when switching to register
+    if (newMode === 'register') {
+      setPassword('');
+      setPasswordError('');
+      setName('');
+      setPhone('');
+      setShowPassword(false);
+    } else {
+      resetForm();
+      setEmail(''); // Clear email only when not going to register
+    }
     setMode(newMode);
   };
 
   const handleProceedToRegister = () => {
     setShowUserNotFound(false);
+    // Pre-fill the email in registration form
+    setEmail(email);
     setMode('register');
   };
 
   const handleStayOnLogin = () => {
     setShowUserNotFound(false);
     setPasswordError('');
-    setEmail('');
     setPassword('');
+    // Keep email so user doesn't have to retype it
   };
 
   return (
