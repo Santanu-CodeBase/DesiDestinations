@@ -79,7 +79,11 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
     <div className="space-y-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-          <Mic className="h-6 w-6 text-orange-600 mr-2" />
+          <img 
+            src="/desi-logo.png" 
+            alt="DesiDestinations Logo" 
+            className="h-6 w-6 mr-2 rounded"
+          />
           Voice Search
         </h2>
 

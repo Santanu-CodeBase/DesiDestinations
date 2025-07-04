@@ -267,7 +267,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center mb-4">
                 <img 
-                  src="/image.png" 
+                  src="/desi-logo.png" 
                   alt="DesiDestinations Logo" 
                   className="h-10 w-10 mr-3 rounded-lg shadow-lg"
                 />
