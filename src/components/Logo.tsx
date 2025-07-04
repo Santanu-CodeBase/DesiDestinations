@@ -13,8 +13,12 @@ const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
   };
 
   return (
-    <div className={`${sizeClasses[size]} ${className} bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 rounded-lg shadow-lg flex items-center justify-center`}>
-      <span className="text-white font-bold text-xs">DD</span>
+    <div className={`${sizeClasses[size]} ${className}`}>
+      <img 
+        src="/desidestinations_logo.svg" 
+        alt="DesiDestinations Logo" 
+        className="w-full h-full object-contain"
+      />
     </div>
   );
 };
