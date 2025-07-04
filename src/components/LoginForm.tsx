@@ -156,14 +156,29 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     try {
+      // Debug: Log what we're looking for
+      console.log('Attempting login with email:', email.trim());
+      
+      // Check all stored users for debugging
+      const allKeys = Object.keys(localStorage).filter(key => key.startsWith('desiDestinations_user_'));
+      console.log('All stored user keys:', allKeys);
+      
       const userData = getUserData(email.trim());
+      console.log('Retrieved user data:', userData);
       
       if (!userData) {
         // User doesn't exist - show user not found dialog
+        console.log('User not found for email:', email.trim());
         setMode('userNotFound');
         setIsLoading(false);
         return;
       }
+
+      console.log('Comparing passwords:', {
+        entered: password.trim(),
+        stored: userData.password,
+        match: userData.password === password.trim()
+      });
 
       if (userData.password !== password.trim()) {
         setPasswordError('Incorrect password. Please check and try again.');
@@ -172,6 +187,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       }
       
       // Successful login
+      console.log('Login successful');
       localStorage.setItem('desiDestinationsEmail', email.trim());
       onLogin(email.trim());
     } catch (error) {
@@ -244,7 +260,10 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
         createdAt: new Date().toISOString()
       };
 
+      console.log('Creating new user:', newUser);
       const saved = saveUserData(newUser);
+      console.log('User saved successfully:', saved);
+      
       if (!saved) {
         setPasswordError('Failed to create account. Please try again.');
         setIsLoading(false);
