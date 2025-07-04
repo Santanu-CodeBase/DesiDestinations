@@ -323,3 +323,5 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
 };
 
 export default LoginFormContainer;
+
+export default LoginForm
