@@ -231,8 +231,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     
     try {
       // Check if user already exists
-     const cleanEmail = email.trim().toLowerCase();
-     const existingUser = getUserData(cleanEmail);
+      const cleanEmail = email.trim().toLowerCase();
+      const existingUser = getUserData(cleanEmail);
       if (existingUser) {
         setEmailError('Account already exists with this email. Please sign in instead.');
         setIsLoading(false);
@@ -242,16 +242,13 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       // Create new user
       const newUser: UserData = {
         name: name.trim(),
-       email: cleanEmail,
-       password: password,
+        email: cleanEmail,
+        password: password,
         phone: phone ? `+91 ${phone}` : undefined,
         createdAt: new Date().toISOString()
       };
 
-      console.log('Creating new user:', newUser);
       const saved = saveUserData(newUser);
-      console.log('User saved successfully:', saved);
-      
       if (!saved) {
         setPasswordError('Failed to create account. Please try again.');
         setIsLoading(false);
@@ -259,8 +256,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       }
 
       // Auto-login after successful registration
-     localStorage.setItem('desiDestinationsEmail', cleanEmail);
-     onLogin(cleanEmail);
+      localStorage.setItem('desiDestinationsEmail', cleanEmail);
+      onLogin(cleanEmail);
     } catch (error) {
       console.error('Registration error:', error);
       setPasswordError('An error occurred during registration. Please try again.');
