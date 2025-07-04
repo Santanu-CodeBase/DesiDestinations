@@ -209,10 +209,10 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       hasErrors = true;
     }
 
-    if (!password.trim()) {
+    if (!password) {
       setPasswordError('Password is required');
       hasErrors = true;
-    } else if (!validatePassword(password)) {
+    } else if (password.length < 6) {
       setPasswordError('Password must be at least 6 characters long');
       hasErrors = true;
     }
