@@ -293,7 +293,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   Account Not Found
                 </h3>
                 <p className="text-blue-700 text-sm leading-relaxed">
-                  We couldn't find an account with this email address. Would you like to create a new account to start exploring India?
+                  We understand you are excited to explore. Please register using the Register link to get started.
                 </p>
                 <div className="flex space-x-3 justify-center">
                   <button
