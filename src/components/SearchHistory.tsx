@@ -34,7 +34,9 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searchHistory, onModifySe
     <div className="space-y-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center space-x-3">
-          <Logo size="sm" className="mr-2" />
+          <div className="flex flex-col items-center mr-4">
+            <Logo size="sm" />
+          </div>
           <span>Search History</span>
         </h2>
 
