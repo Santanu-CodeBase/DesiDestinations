@@ -373,7 +373,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
             </div>
 
             {/* User Not Found Dialog */}
-            {mode === 'userNotFound' && (
+            {mode === 'userNotFound' && !isLoading && (
               <UserNotFoundDialog
                 onProceedToRegister={handleProceedToRegister}
                 onStayOnLogin={handleStayOnLogin}
@@ -381,7 +381,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
             )}
 
             {/* Forgot Password Form */}
-            {mode === 'forgot' && (
+            {mode === 'forgot' && !isLoading && (
               <ForgotPasswordForm
                 resetEmail={resetEmail}
                 resetLinkSent={resetLinkSent}
@@ -393,7 +393,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
             )}
 
             {/* Login Form */}
-            {mode === 'login' && (
+            {mode === 'login' && !isLoading && (
               <LoginForm
                 email={email}
                 password={password}
@@ -411,7 +411,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
             )}
 
             {/* Registration Form */}
-            {mode === 'register' && (
+            {mode === 'register' && !isLoading && (
               <RegisterForm
                 name={name}
                 email={email}
@@ -431,6 +431,14 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
                 onSubmit={handleRegister}
                 onSwitchToLogin={() => switchToMode('login')}
               />
+            )}
+
+            {/* Loading State */}
+            {isLoading && (
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-amber-100 text-center space-y-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto"></div>
+                <p className="text-gray-600">Processing...</p>
+              </div>
             )}
 
             {/* Cultural Touch */}
