@@ -156,7 +156,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     try {
-      const userData = getUserData(email);
+      const userData = getUserData(email.trim());
       
       if (!userData) {
         // User doesn't exist - show user not found dialog
@@ -165,7 +165,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
         return;
       }
 
-      if (userData.password !== password) {
+      if (userData.password !== password.trim()) {
         setPasswordError('Incorrect password. Please check and try again.');
         setIsLoading(false);
         return;
@@ -228,7 +228,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     
     try {
       // Check if user already exists
-      const existingUser = getUserData(email);
+      const existingUser = getUserData(email.trim());
       if (existingUser) {
         setEmailError('Account already exists with this email. Please sign in instead.');
         setIsLoading(false);
@@ -239,7 +239,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       const newUser: UserData = {
         name: name.trim(),
         email: email.trim(),
-        password: password,
+        password: password.trim(),
         phone: phone ? `+91 ${phone}` : undefined,
         createdAt: new Date().toISOString()
       };
