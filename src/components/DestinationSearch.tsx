@@ -448,51 +448,61 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         {fromDestination && toDestination ? (
           // Travel Recommendations
           <div className="space-y-6">
-            {/* View Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4 flex-1 mr-4">
-                <div className="flex items-center justify-center space-x-4 mb-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="font-semibold text-green-700">{fromDestination}</span>
-                  </div>
-                  <Route className="h-5 w-5 text-gray-400" />
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="font-semibold text-blue-700">{toDestination}</span>
-                  </div>
-                </div>
-                <p className="text-center text-sm text-gray-600">
-                  Choose your preferred mode of transport
-                </p>
+            {/* View Toggle - Top Position */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <h4 className="text-lg font-semibold text-gray-900">Travel Options</h4>
+                <span className="text-sm text-gray-500">
+                  {fromDestination} → {toDestination}
+                </span>
               </div>
               
-              <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('row')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'row'
-                      ? 'bg-white text-orange-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                  title="Row view"
-                >
-                  <List className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('tile')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'tile'
-                      ? 'bg-white text-orange-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                  title="Tile view"
-                >
-                  <Grid className="h-4 w-4" />
-                </button>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600 font-medium">View:</span>
+                <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('row')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'row'
+                        ? 'bg-white text-orange-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                    title="Row view"
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('tile')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'tile'
+                        ? 'bg-white text-orange-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                    title="Tile view"
+                  >
+                    <Grid className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
 
+            {/* Route Summary */}
+            <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-center space-x-4 mb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="font-semibold text-green-700">{fromDestination}</span>
+                </div>
+                <Route className="h-5 w-5 text-gray-400" />
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="font-semibold text-blue-700">{toDestination}</span>
+                </div>
+              </div>
+              <p className="text-center text-sm text-gray-600">
+                Choose your preferred mode of transport
+              </p>
+            </div>
             {/* Travel Options */}
             <div className={viewMode === 'tile' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-3'}>
               {travelRecommendations.map((option, index) => {
