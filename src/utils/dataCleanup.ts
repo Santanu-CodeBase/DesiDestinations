@@ -19,111 +19,37 @@ export class DataCleanup {
       const allKeys = Object.keys(localStorage);
       console.log('Starting cleanup. Found keys:', allKeys);
       
-      // Remove all user account data (pattern: desiDestinations_user_*)
-      const userKeys = allKeys.filter(key => key.startsWith('desiDestinations_user_'));
-      console.log('User account keys to remove:', userKeys);
-      
-      userKeys.forEach(key => {
+      // Remove ALL localStorage data (complete reset)
+      allKeys.forEach(key => {
         try {
           localStorage.removeItem(key);
           itemsRemoved.push(key);
-          console.log('Removed user key:', key);
+          console.log('Removed key:', key);
         } catch (error) {
           errors.push(`Failed to remove ${key}: ${error}`);
         }
       });
       
-      // Remove current logged-in user session
-      if (localStorage.getItem('desiDestinationsEmail')) {
-        try {
-          localStorage.removeItem('desiDestinationsEmail');
-          itemsRemoved.push('desiDestinationsEmail');
-          console.log('Removed current session');
-        } catch (error) {
-          errors.push(`Failed to remove session: ${error}`);
-        }
-      }
-      
-      // Remove search history
-      if (localStorage.getItem('searchHistory')) {
-        try {
-          localStorage.removeItem('searchHistory');
-          itemsRemoved.push('searchHistory');
-          console.log('Removed search history');
-        } catch (error) {
-          errors.push(`Failed to remove search history: ${error}`);
-        }
-      }
-      
-      // Remove notifications
-      if (localStorage.getItem('notifications')) {
-        try {
-          localStorage.removeItem('notifications');
-          itemsRemoved.push('notifications');
-          console.log('Removed notifications');
-        } catch (error) {
-          errors.push(`Failed to remove notifications: ${error}`);
-        }
-      }
-      
-      // Remove any other app-specific data
-      const appDataKeys = allKeys.filter(key => 
-        key.startsWith('desiDestinations') && 
-        !userKeys.includes(key) && 
-        key !== 'desiDestinationsEmail' &&
-        key !== 'searchHistory' &&
-        key !== 'notifications'
-      );
-      
-      console.log('Additional app data keys to remove:', appDataKeys);
-      
-      appDataKeys.forEach(key => {
-        try {
-          localStorage.removeItem(key);
-          itemsRemoved.push(key);
-          console.log('Removed app data key:', key);
-        } catch (error) {
-          errors.push(`Failed to remove ${key}: ${error}`);
-        }
-      });
-      
-      // Additional cleanup for any remaining user-related data
-      const remainingKeys = Object.keys(localStorage);
-      const suspiciousKeys = remainingKeys.filter(key => 
-        key.toLowerCase().includes('user') || 
-        key.toLowerCase().includes('auth') ||
-        key.toLowerCase().includes('login') ||
-        key.toLowerCase().includes('session')
-      );
-      
-      if (suspiciousKeys.length > 0) {
-        console.log('Found suspicious remaining keys:', suspiciousKeys);
-        suspiciousKeys.forEach(key => {
-          try {
-            localStorage.removeItem(key);
-            itemsRemoved.push(key);
-            console.log('Removed suspicious key:', key);
-          } catch (error) {
-            errors.push(`Failed to remove suspicious key ${key}: ${error}`);
-          }
-        });
+      // Double-check by clearing everything
+      try {
+        localStorage.clear();
+        console.log('localStorage.clear() executed');
+      } catch (error) {
+        errors.push(`Failed to clear localStorage: ${error}`);
       }
       
       // Verify cleanup was successful
       const finalKeys = Object.keys(localStorage);
-      const remainingUserData = finalKeys.filter(key => 
-        key.startsWith('desiDestinations') ||
-        key.toLowerCase().includes('user') ||
-        key.toLowerCase().includes('auth')
-      );
-      
       console.log('Cleanup complete. Remaining keys:', finalKeys);
-      console.log('Remaining user data keys:', remainingUserData);
       
-      const success = errors.length === 0;
+      if (finalKeys.length > 0) {
+        errors.push(`Warning: ${finalKeys.length} keys still remain: ${finalKeys.join(', ')}`);
+      }
+      
+      const success = finalKeys.length === 0;
       const message = success 
-        ? `Successfully cleaned ${itemsRemoved.length} data items. Database is now empty.`
-        : `Cleaned ${itemsRemoved.length} items with ${errors.length} errors.`;
+        ? `Successfully cleaned all data. Database is now completely empty.`
+        : `Cleaned ${itemsRemoved.length} items but ${finalKeys.length} items remain.`;
       
       return {
         success,
@@ -185,7 +111,7 @@ export class DataCleanup {
         userAccounts: userKeys.length,
         searchHistoryItems,
         notificationItems,
-        totalDataItems: userDataKeys.length,
+        totalDataItems: allKeys.length, // Count ALL items, not just user data
         allKeys,
         userDataKeys
       };
@@ -213,8 +139,21 @@ export class DataCleanup {
       const allKeys = Object.keys(localStorage);
       console.log('All localStorage keys before reset:', allKeys);
       
-      // Clear everything
+      // Clear everything multiple times to ensure it's gone
       localStorage.clear();
+      
+      // Remove each key individually as backup
+      allKeys.forEach(key => {
+        try {
+          localStorage.removeItem(key);
+        } catch (error) {
+          console.error(`Error removing key ${key}:`, error);
+        }
+      });
+      
+      // Clear again
+      localStorage.clear();
+      
       console.log('localStorage cleared completely');
       
       // Verify it's empty
@@ -223,6 +162,7 @@ export class DataCleanup {
       
       // Force page reload to reset React state
       setTimeout(() => {
+        console.log('Reloading page to reset app state...');
         window.location.reload();
       }, 500);
       
@@ -245,6 +185,7 @@ export class DataCleanup {
     
     // Force page reload to reset React state
     setTimeout(() => {
+      console.log('Reloading app after cleanup...');
       window.location.reload();
     }, 1000);
   }
@@ -258,21 +199,55 @@ export class DataCleanup {
     message: string;
   } {
     try {
-      const stats = this.getDataStats();
-      const isClean = stats.totalDataItems === 0;
+      const allKeys = Object.keys(localStorage);
+      const isClean = allKeys.length === 0;
       
       return {
         isClean,
-        remainingItems: stats.userDataKeys,
+        remainingItems: allKeys,
         message: isClean 
-          ? 'Database is completely clean' 
-          : `Database still contains ${stats.totalDataItems} items`
+          ? 'Database is completely clean - no data exists' 
+          : `Database contains ${allKeys.length} items: ${allKeys.join(', ')}`
       };
     } catch (error) {
       return {
         isClean: false,
         remainingItems: [],
         message: `Verification failed: ${error}`
+      };
+    }
+  }
+  
+  /**
+   * Check if any user can currently login
+   */
+  static canAnyUserLogin(): {
+    canLogin: boolean;
+    userCount: number;
+    currentSession: string | null;
+    message: string;
+  } {
+    try {
+      const allKeys = Object.keys(localStorage);
+      const userKeys = allKeys.filter(key => key.startsWith('desiDestinations_user_'));
+      const currentSession = localStorage.getItem('desiDestinationsEmail');
+      
+      const canLogin = userKeys.length > 0;
+      
+      return {
+        canLogin,
+        userCount: userKeys.length,
+        currentSession,
+        message: canLogin 
+          ? `${userKeys.length} users can still login` 
+          : 'No users can login - database is clean'
+      };
+    } catch (error) {
+      return {
+        canLogin: false,
+        userCount: 0,
+        currentSession: null,
+        message: `Check failed: ${error}`
       };
     }
   }
