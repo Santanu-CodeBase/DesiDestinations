@@ -1,395 +1,253 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Plus, X, Star, ExternalLink, Clock, DollarSign, Zap, Award, TrendingUp, Users, Lightbulb, Info, Camera, IndianRupee, ArrowRight, Plane, Train, Bus, Car } from 'lucide-react';
-import Logo from './Logo';
-import { indianDestinations } from '../data/destinations';
+import { Search, MapPin, Calendar, Plane, Train, Bus, Car, Clock, IndianRupee, Star, ArrowRight } from 'lucide-react';
 import { SearchRecord } from '../types';
 
 interface DestinationSearchProps {
   onSearchComplete: (search: Omit<SearchRecord, 'id' | 'timestamp'>) => void;
 }
 
+interface TravelOption {
+  mode: string;
+  icon: React.ComponentType<any>;
+  duration: string;
+  cost: string;
+  description: string;
+  recommended: boolean;
+}
+
 const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete }) => {
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeField, setActiveField] = useState<'source' | 'destination' | null>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [travelRecommendation, setTravelRecommendation] = useState<{
-    mode: string;
-    duration: string;
-    cost: string;
-    icon: React.ComponentType<any>;
-    description: string;
-    alternatives: Array<{
-      mode: string;
-      duration: string;
-      cost: string;
-      icon: React.ComponentType<any>;
-    }>;
-  } | null>(null);
+  const [searchResults, setSearchResults] = useState<TravelOption[]>([]);
+  const [showResults, setShowResults] = useState(false);
 
-  const today = new Date();
-  const maxDate = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000);
+  // Get today's date and max date (90 days from now)
+  const today = new Date().toISOString().split('T')[0];
+  const maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  const formatDateForInput = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
+  // Popular Indian destinations
+  const popularDestinations = [
+    'Delhi', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad',
+    'Pune', 'Ahmedabad', 'Jaipur', 'Goa', 'Kerala', 'Rajasthan'
+  ];
 
-  const formatDateDDMMYYYY = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
-  };
-
-  // Function to calculate travel recommendations based on source and destination
-  const getTravelRecommendation = (source: string, destination: string) => {
-    // Enhanced distance calculation with more routes
-    const calculateDistance = (src: string, dest: string) => {
-      const routes: { [key: string]: number } = {
-        // Major city pairs
-        'Delhi-Mumbai': 1400, 'Mumbai-Delhi': 1400,
-        'Delhi-Bangalore': 2150, 'Bangalore-Delhi': 2150,
-        'Delhi-Chennai': 2180, 'Chennai-Delhi': 2180,
-        'Delhi-Kolkata': 1500, 'Kolkata-Delhi': 1500,
-        'Delhi-Hyderabad': 1570, 'Hyderabad-Delhi': 1570,
-        'Delhi-Pune': 1450, 'Pune-Delhi': 1450,
-        'Delhi-Ahmedabad': 950, 'Ahmedabad-Delhi': 950,
-        'Delhi-Jaipur': 280, 'Jaipur-Delhi': 280,
-        'Delhi-Chandigarh': 250, 'Chandigarh-Delhi': 250,
-        
-        'Mumbai-Bangalore': 980, 'Bangalore-Mumbai': 980,
-        'Mumbai-Chennai': 1340, 'Chennai-Mumbai': 1340,
-        'Mumbai-Kolkata': 1950, 'Kolkata-Mumbai': 1950,
-        'Mumbai-Hyderabad': 710, 'Hyderabad-Mumbai': 710,
-        'Mumbai-Pune': 150, 'Pune-Mumbai': 150,
-        'Mumbai-Goa': 600, 'Goa-Mumbai': 600,
-        'Mumbai-Ahmedabad': 530, 'Ahmedabad-Mumbai': 530,
-        
-        'Bangalore-Chennai': 350, 'Chennai-Bangalore': 350,
-        'Bangalore-Hyderabad': 570, 'Hyderabad-Bangalore': 570,
-        'Bangalore-Kochi': 460, 'Kochi-Bangalore': 460,
-        'Bangalore-Mysore': 150, 'Mysore-Bangalore': 150,
-        
-        'Chennai-Hyderabad': 630, 'Hyderabad-Chennai': 630,
-        'Chennai-Kochi': 700, 'Kochi-Chennai': 700,
-        'Chennai-Kerala': 700, 'Kerala-Chennai': 700,
-        'Chennai-Madurai': 460, 'Madurai-Chennai': 460,
-        
-        'Kolkata-Bhubaneswar': 440, 'Bhubaneswar-Kolkata': 440,
-        'Kolkata-Guwahati': 1000, 'Guwahati-Kolkata': 1000,
-        
-        // State to state distances
-        'Rajasthan-Gujarat': 400, 'Gujarat-Rajasthan': 400,
-        'Kerala-Tamil Nadu': 300, 'Tamil Nadu-Kerala': 300,
-        'Karnataka-Kerala': 200, 'Kerala-Karnataka': 200,
-        'Maharashtra-Goa': 450, 'Goa-Maharashtra': 450,
-        'Himachal Pradesh-Punjab': 200, 'Punjab-Himachal Pradesh': 200,
-        'Uttarakhand-Delhi': 300, 'Delhi-Uttarakhand': 300,
+  // Travel recommendation engine
+  const generateTravelRecommendations = (from: string, to: string): TravelOption[] => {
+    // Calculate approximate distance (simplified logic)
+    const getDistance = (source: string, dest: string): number => {
+      const majorCities: { [key: string]: { lat: number; lng: number } } = {
+        'Delhi': { lat: 28.6139, lng: 77.2090 },
+        'Mumbai': { lat: 19.0760, lng: 72.8777 },
+        'Bangalore': { lat: 12.9716, lng: 77.5946 },
+        'Chennai': { lat: 13.0827, lng: 80.2707 },
+        'Kolkata': { lat: 22.5726, lng: 88.3639 },
+        'Hyderabad': { lat: 17.3850, lng: 78.4867 },
+        'Pune': { lat: 18.5204, lng: 73.8567 },
+        'Ahmedabad': { lat: 23.0225, lng: 72.5714 },
+        'Jaipur': { lat: 26.9124, lng: 75.7873 },
+        'Goa': { lat: 15.2993, lng: 74.1240 },
+        'Kerala': { lat: 10.8505, lng: 76.2711 },
+        'Rajasthan': { lat: 27.0238, lng: 74.2179 }
       };
-      
-      const routeKey = `${src}-${dest}`;
-      if (routes[routeKey]) return routes[routeKey];
-      
-      // Try reverse route
-      const reverseKey = `${dest}-${src}`;
-      if (routes[reverseKey]) return routes[reverseKey];
-      
-      // Calculate based on region proximity
-      const northStates = ['Delhi', 'Punjab', 'Haryana', 'Himachal Pradesh', 'Uttarakhand', 'Uttar Pradesh', 'Rajasthan', 'Jammu and Kashmir', 'Ladakh'];
-      const southStates = ['Karnataka', 'Tamil Nadu', 'Kerala', 'Andhra Pradesh', 'Telangana'];
-      const westStates = ['Maharashtra', 'Gujarat', 'Goa', 'Rajasthan'];
-      const eastStates = ['West Bengal', 'Odisha', 'Jharkhand', 'Bihar', 'Assam', 'Meghalaya', 'Tripura', 'Manipur', 'Mizoram', 'Nagaland', 'Arunachal Pradesh'];
-      
-      const getRegion = (place: string) => {
-        if (northStates.some(state => place.includes(state) || state.includes(place))) return 'north';
-        if (southStates.some(state => place.includes(state) || state.includes(place))) return 'south';
-        if (westStates.some(state => place.includes(state) || state.includes(place))) return 'west';
-        if (eastStates.some(state => place.includes(state) || state.includes(place))) return 'east';
-        return 'central';
-      };
-      
-      const srcRegion = getRegion(src);
-      const destRegion = getRegion(dest);
-      
-      if (srcRegion === destRegion) return 300; // Same region
-      if ((srcRegion === 'north' && destRegion === 'south') || (srcRegion === 'south' && destRegion === 'north')) return 1800;
-      if ((srcRegion === 'east' && destRegion === 'west') || (srcRegion === 'west' && destRegion === 'east')) return 1500;
-      return 800; // Default for other combinations
+
+      const sourceCoords = majorCities[source] || { lat: 20, lng: 77 };
+      const destCoords = majorCities[dest] || { lat: 20, lng: 77 };
+
+      // Simple distance calculation
+      const latDiff = sourceCoords.lat - destCoords.lat;
+      const lngDiff = sourceCoords.lng - destCoords.lng;
+      const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111; // Rough km conversion
+
+      return Math.max(distance, 100); // Minimum 100km
     };
 
-    const distance = calculateDistance(source, destination);
+    const distance = getDistance(from, to);
+    const options: TravelOption[] = [];
 
-    // Determine best travel mode based on distance and route popularity
-    if (distance > 1000) {
-      // Long distance - recommend flight
-      return {
-        mode: 'Flight',
-        duration: '2-3 hours',
-        cost: '₹4,000-8,000',
-        icon: Plane,
-        description: 'Fastest option for long distances. Book in advance for better prices.',
-        alternatives: [
-          { mode: 'Train', duration: '12-20 hours', cost: '₹800-2,500', icon: Train },
-          { mode: 'Bus', duration: '15-24 hours', cost: '₹600-1,500', icon: Bus }
-        ]
-      };
-    } else if (distance > 500) {
-      // Medium distance - recommend train
-      return {
-        mode: 'Train',
-        duration: '6-12 hours',
-        cost: '₹500-1,800',
-        icon: Train,
-        description: 'Comfortable and economical for medium distances. Good connectivity.',
-        alternatives: [
-          { mode: 'Flight', duration: '1-2 hours', cost: '₹3,000-6,000', icon: Plane },
-          { mode: 'Bus', duration: '8-14 hours', cost: '₹400-1,000', icon: Bus },
-          { mode: 'Car', duration: '6-10 hours', cost: '₹2,000-4,000', icon: Car }
-        ]
-      };
-    } else {
-      // Short distance - recommend road/bus
-      return {
-        mode: 'Bus/Car',
-        duration: '3-6 hours',
-        cost: '₹200-800',
-        icon: Bus,
-        description: 'Most convenient for short distances. Flexible timing and routes.',
-        alternatives: [
-          { mode: 'Train', duration: '4-8 hours', cost: '₹300-800', icon: Train },
-          { mode: 'Flight', duration: '1 hour', cost: '₹2,500-5,000', icon: Plane }
-        ]
-      };
-    }
-  };
+    // Flight option
+    options.push({
+      mode: 'Flight',
+      icon: Plane,
+      duration: distance > 1000 ? '2-3 hours' : '1-2 hours',
+      cost: distance > 1000 ? '₹4,000-8,000' : '₹2,500-5,000',
+      description: 'Fastest option with multiple daily flights',
+      recommended: distance > 800
+    });
 
-  const filteredDestinations = indianDestinations.filter(dest =>
-    dest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dest.state.toLowerCase().includes(searchTerm.toLowerCase())
-  ).slice(0, 10);
+    // Train option
+    options.push({
+      mode: 'Train',
+      icon: Train,
+      duration: distance > 1000 ? '12-18 hours' : distance > 500 ? '6-12 hours' : '3-8 hours',
+      cost: distance > 1000 ? '₹800-2,500' : distance > 500 ? '₹400-1,200' : '₹200-600',
+      description: 'Comfortable journey with good connectivity',
+      recommended: distance > 300 && distance <= 800
+    });
 
-  const handleDestinationSelect = (selectedDest: string) => {
-    if (activeField === 'source') {
-      setSource(selectedDest);
-    } else if (activeField === 'destination') {
-      setDestination(selectedDest);
-    }
-    setSearchTerm('');
-    setShowSuggestions(false);
-    setActiveField(null);
-  };
+    // Bus option
+    options.push({
+      mode: 'Bus',
+      icon: Bus,
+      duration: distance > 1000 ? '15-24 hours' : distance > 500 ? '8-15 hours' : '3-8 hours',
+      cost: distance > 1000 ? '₹600-1,500' : distance > 500 ? '₹300-800' : '₹150-400',
+      description: 'Economical option with flexible timings',
+      recommended: distance <= 600
+    });
 
-  const handleInputFocus = (field: 'source' | 'destination') => {
-    setActiveField(field);
-    setShowSuggestions(true);
-  };
+    // Car/Road option
+    options.push({
+      mode: 'Car/Road',
+      icon: Car,
+      duration: distance > 1000 ? '12-20 hours' : distance > 500 ? '6-12 hours' : '2-6 hours',
+      cost: distance > 1000 ? '₹3,000-6,000' : distance > 500 ? '₹1,500-3,000' : '₹500-1,500',
+      description: 'Complete flexibility and scenic routes',
+      recommended: distance <= 400
+    });
 
-  const handleInputChange = (value: string, field: 'source' | 'destination') => {
-    setSearchTerm(value);
-    if (field === 'source') {
-      setSource(value);
-    } else {
-      setDestination(value);
-    }
-    setActiveField(field);
-    setShowSuggestions(true);
+    // Sort by recommendation
+    return options.sort((a, b) => (b.recommended ? 1 : 0) - (a.recommended ? 1 : 0));
   };
 
   const handleSearch = async () => {
-    if (!source.trim() || !destination.trim() || !startDate || !endDate) return;
+    if (!source.trim() || !destination.trim() || !startDate || !endDate) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    if (source.toLowerCase() === destination.toLowerCase()) {
+      alert('Source and destination cannot be the same');
+      return;
+    }
 
     setIsSearching(true);
-    
-    // Clear previous recommendation
-    setTravelRecommendation(null);
-    
+    setShowResults(false);
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Generate travel recommendation
-    const recommendation = getTravelRecommendation(source.trim(), destination.trim());
-    console.log('Generated recommendation:', recommendation); // Debug log
-    setTravelRecommendation(recommendation);
+    // Generate travel recommendations
+    const recommendations = generateTravelRecommendations(source, destination);
+    setSearchResults(recommendations);
+    setShowResults(true);
 
-    const selectedDestinations = [source, destination];
-
-    // Generate mock activities for each destination
-    const activities: { [key: string]: string[] } = {};
-    selectedDestinations.forEach(dest => {
-      const destData = indianDestinations.find(d => d.name === dest);
-      activities[dest] = destData ? destData.activities.slice(0, 3) : [];
-    });
-
+    // Create search record for history
     const searchRecord: Omit<SearchRecord, 'id' | 'timestamp'> = {
-      destinations: selectedDestinations,
-      startDate: formatDateDDMMYYYY(startDate),
-      endDate: formatDateDDMMYYYY(endDate),
-      activities,
+      destinations: [source, destination],
+      startDate: new Date(startDate).toLocaleDateString('en-GB'),
+      endDate: new Date(endDate).toLocaleDateString('en-GB'),
+      activities: {
+        [source]: ['Departure preparation', 'Local exploration'],
+        [destination]: ['Sightseeing', 'Local cuisine', 'Cultural activities']
+      },
       status: 'active'
     };
 
     onSearchComplete(searchRecord);
     setIsSearching(false);
-    
-    // Don't reset form after search so user can see their selection
-    // setSource('');
-    // setDestination('');
-    // setStartDate('');
-    // setEndDate('');
+  };
+
+  const handlePopularDestinationClick = (dest: string) => {
+    if (!source) {
+      setSource(dest);
+    } else if (!destination && dest !== source) {
+      setDestination(dest);
+    }
+  };
+
+  const clearForm = () => {
+    setSource('');
+    setDestination('');
+    setStartDate('');
+    setEndDate('');
+    setShowResults(false);
+    setSearchResults([]);
   };
 
   return (
     <div className="space-y-6">
+      {/* Search Form */}
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-          <Search className="h-6 w-6 text-orange-600 mr-2" />
-          Plan Your Journey
-        </h2>
-
-        {/* Destination Selection */}
-        <div className="space-y-4">
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Source Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Source
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={activeField === 'source' ? searchTerm : source}
-                    onChange={(e) => handleInputChange(e.target.value, 'source')}
-                    onFocus={() => handleInputFocus('source')}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                    placeholder="Enter departure city..."
-                  />
-                  
-                  {/* Source Suggestions */}
-                  {showSuggestions && searchTerm && activeField === 'source' && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                      {filteredDestinations.map(dest => (
-                        <button
-                          key={dest.name}
-                          onClick={() => handleDestinationSelect(dest.name)}
-                          className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
-                        >
-                          <div>
-                            <span className="font-medium">{dest.name}</span>
-                            <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
-                          </div>
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
-                            {dest.type}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Destination Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Destination
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={activeField === 'destination' ? searchTerm : destination}
-                    onChange={(e) => handleInputChange(e.target.value, 'destination')}
-                    onFocus={() => handleInputFocus('destination')}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                    placeholder="Enter destination city..."
-                  />
-                  
-                  {/* Destination Suggestions */}
-                  {showSuggestions && searchTerm && activeField === 'destination' && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                      {filteredDestinations.map(dest => (
-                        <button
-                          key={dest.name}
-                          onClick={() => handleDestinationSelect(dest.name)}
-                          className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
-                        >
-                          <div>
-                            <span className="font-medium">{dest.name}</span>
-                            <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
-                          </div>
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
-                            {dest.type}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Show selected source and destination */}
-          {(source || destination) && (
-            <div className="flex flex-wrap gap-2">
-              {source && (
-                <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm font-medium">From: {source}</span>
-                  <button
-                    onClick={() => setSource('')}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-              {destination && (
-                <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm font-medium">To: {destination}</span>
-                  <button
-                    onClick={() => setDestination('')}
-                    className="text-green-500 hover:text-green-700"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-            </div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+            <Search className="h-6 w-6 text-orange-600 mr-2" />
+            Plan Your Journey
+          </h2>
+          {(source || destination || startDate || endDate) && (
+            <button
+              onClick={clearForm}
+              className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-100"
+            >
+              Clear All
+            </button>
           )}
         </div>
 
-        <div className="space-y-4 mt-4">
-          {/* Date Selection */}
+        <div className="space-y-4">
+          {/* Source and Destination */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="h-4 w-4 inline mr-1" />
+                Source
+              </label>
+              <input
+                type="text"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                placeholder="Enter departure city"
+                disabled={isSearching}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="h-4 w-4 inline mr-1" />
+                Destination
+              </label>
+              <input
+                type="text"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                placeholder="Enter destination city"
+                disabled={isSearching}
+              />
+            </div>
+          </div>
+
+          {/* Dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="h-4 w-4 inline mr-1" />
                 Start Date
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                min={formatDateForInput(today)}
-                max={formatDateForInput(maxDate)}
+                min={today}
+                max={maxDate}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                disabled={isSearching}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="h-4 w-4 inline mr-1" />
                 End Date
               </label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                min={startDate || formatDateForInput(today)}
-                max={formatDateForInput(maxDate)}
+                min={startDate || today}
+                max={maxDate}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                disabled={isSearching}
               />
             </div>
           </div>
@@ -397,7 +255,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           {/* Search Button */}
           <button
             onClick={handleSearch}
-            disabled={!source.trim() || !destination.trim() || !startDate || !endDate || isSearching}
+            disabled={!source || !destination || !startDate || !endDate || isSearching}
             className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             {isSearching ? (
@@ -408,7 +266,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
             ) : (
               <>
                 <Search className="h-5 w-5" />
-                <span>Search Destinations</span>
+                <span>Find Best Travel Options</span>
               </>
             )}
           </button>
@@ -416,88 +274,89 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
       </div>
 
       {/* Travel Recommendations */}
-      {travelRecommendation && (
+      {showResults && searchResults.length > 0 && (
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-green-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Award className="h-5 w-5 text-green-600 mr-2" />
-            Recommended Travel Option
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <Star className="h-5 w-5 text-green-600 mr-2" />
+            Travel Recommendations: {source} → {destination}
           </h3>
           
-          {/* Primary Recommendation */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border border-green-200">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-green-500 rounded-full text-white">
-                <travelRecommendation.icon className="h-6 w-6" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-green-800">{travelRecommendation.mode}</h4>
-                <p className="text-green-700 text-sm mb-2">{travelRecommendation.description}</p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-green-600" />
-                    <span className="text-green-800 font-medium">{travelRecommendation.duration}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <IndianRupee className="h-4 w-4 text-green-600" />
-                    <span className="text-green-800 font-medium">{travelRecommendation.cost}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  Best Choice
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Alternative Options */}
-          <div>
-            <h4 className="text-md font-semibold text-gray-800 mb-3">Alternative Options</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {travelRecommendation.alternatives.map((alt, index) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-orange-300 transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gray-400 rounded-full text-white">
-                      <alt.icon className="h-4 w-4" />
+          <div className="space-y-4">
+            {searchResults.map((option, index) => (
+              <div
+                key={index}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  option.recommended
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-3 rounded-full ${
+                      option.recommended ? 'bg-green-500' : 'bg-gray-400'
+                    } text-white`}>
+                      <option.icon className="h-6 w-6" />
                     </div>
-                    <div className="flex-1">
-                      <h5 className="font-medium text-gray-800">{alt.mode}</h5>
-                      <div className="text-xs text-gray-600 space-y-1">
-                        <div className="flex items-center space-x-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{alt.duration}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <IndianRupee className="h-3 w-3" />
-                          <span>{alt.cost}</span>
-                        </div>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <h4 className="text-lg font-bold text-gray-900">{option.mode}</h4>
+                        {option.recommended && (
+                          <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                            Recommended
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{option.description}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center space-x-4 text-sm">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">{option.duration}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <IndianRupee className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">{option.cost}</span>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
 
           {/* Booking Links */}
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-800 mb-2 font-medium">Quick Booking Links:</p>
-            <div className="flex flex-wrap gap-2">
-              <a href="https://www.irctc.co.in" target="_blank" rel="noopener noreferrer" 
-                 className="text-xs bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600 transition-colors flex items-center space-x-1">
-                <Train className="h-3 w-3" />
-                <span>IRCTC</span>
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h4 className="font-medium text-blue-900 mb-3">Quick Booking Links:</h4>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://www.irctc.co.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+              >
+                <Train className="h-4 w-4" />
+                <span>IRCTC (Trains)</span>
               </a>
-              <a href="https://www.redbus.in" target="_blank" rel="noopener noreferrer"
-                 className="text-xs bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 transition-colors flex items-center space-x-1">
-                <Bus className="h-3 w-3" />
-                <span>RedBus</span>
+              <a
+                href="https://www.redbus.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
+              >
+                <Bus className="h-4 w-4" />
+                <span>RedBus (Buses)</span>
               </a>
-              <a href="https://www.goindigo.in" target="_blank" rel="noopener noreferrer"
-                 className="text-xs bg-indigo-500 text-white px-3 py-1 rounded-full hover:bg-indigo-600 transition-colors flex items-center space-x-1">
-                <Plane className="h-3 w-3" />
-                <span>IndiGo</span>
+              <a
+                href="https://www.goindigo.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm"
+              >
+                <Plane className="h-4 w-4" />
+                <span>IndiGo (Flights)</span>
               </a>
             </div>
           </div>
@@ -510,23 +369,21 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           <Star className="h-5 w-5 text-orange-600 mr-2" />
           Popular Destinations
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {['Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Tamil Nadu', 'Karnataka', 'Uttarakhand', 'Maharashtra'].map(dest => (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {popularDestinations.map((dest) => (
             <button
               key={dest}
-              onClick={() => {
-                if (!source) {
-                  setSource(dest);
-                } else if (!destination) {
-                  setDestination(dest);
-                }
-              }}
-              className="p-3 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200 hover:border-orange-300"
+              onClick={() => handlePopularDestinationClick(dest)}
+              className="p-3 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200 hover:border-orange-300 text-sm font-medium text-orange-700"
+              disabled={isSearching}
             >
-              <span className="text-sm font-medium text-orange-700">{dest}</span>
+              {dest}
             </button>
           ))}
         </div>
+        <p className="text-xs text-gray-500 mt-3 text-center">
+          Click to add as source or destination
+        </p>
       </div>
     </div>
   );
