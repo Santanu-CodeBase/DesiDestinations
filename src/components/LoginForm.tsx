@@ -34,6 +34,12 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   // Reset password state
   const [resetEmail, setResetEmail] = useState('');
   const [resetLinkSent, setResetLinkSent] = useState(false);
+  const [resetToken, setResetToken] = useState<string | null>(null);
+  const [tokenExpiry, setTokenExpiry] = useState<Date | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   // Error states
   const [passwordError, setPasswordError] = useState('');
@@ -115,9 +121,13 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   // Clear form data
   const clearForm = () => {
     setPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
     setName('');
     setPhone('');
     setShowPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
     clearErrors();
   };
 
@@ -295,19 +305,32 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       return;
     }
 
+    // Check if user exists
+    const cleanEmail = resetEmail.trim().toLowerCase();
+    const userData = getUserData(cleanEmail);
+    
+    if (!userData) {
+      setEmailError('No account found with this email address.');
+      return;
+    }
+
     setIsLoading(true);
     
-    // Simulate sending reset email
+    // Generate reset token and expiry (15 minutes)
     await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const token = `reset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+    
+    // Store reset token with expiry
+    localStorage.setItem(`reset_token_${cleanEmail}`, JSON.stringify({
+      token,
+      expiry: expiry.toISOString(),
+      email: cleanEmail
+    }));
     
     setResetLinkSent(true);
     setIsLoading(false);
-    
-    // Auto-return to login after 5 seconds
-    setTimeout(() => {
-      setResetLinkSent(false);
-      switchToMode('login');
-    }, 5000);
   };
 
   // Switch between different modes
@@ -315,7 +338,105 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     clearForm();
     setResetEmail('');
     setResetLinkSent(false);
+    setResetToken(null);
+    setTokenExpiry(null);
     setMode(newMode);
+  };
+
+  // Handle using the reset link
+  const handleUseResetLink = () => {
+    const cleanEmail = resetEmail.trim().toLowerCase();
+    const resetData = localStorage.getItem(`reset_token_${cleanEmail}`);
+    
+    if (!resetData) {
+      setEmailError('Reset link not found. Please generate a new one.');
+      return;
+    }
+    
+    try {
+      const { token, expiry } = JSON.parse(resetData);
+      const expiryDate = new Date(expiry);
+      
+      if (new Date() > expiryDate) {
+        localStorage.removeItem(`reset_token_${cleanEmail}`);
+        setEmailError('Reset link has expired. Please generate a new one.');
+        setResetLinkSent(false);
+        return;
+      }
+      
+      setResetToken(token);
+      setTokenExpiry(expiryDate);
+      setNewPassword('');
+      setConfirmPassword('');
+      clearErrors();
+    } catch (error) {
+      setEmailError('Invalid reset link. Please generate a new one.');
+    }
+  };
+
+  // Handle password reset submission
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
+    
+    // Validate passwords
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    
+    // Check if token is still valid
+    if (!tokenExpiry || new Date() > tokenExpiry) {
+      setPasswordError('Reset link has expired. Please request a new one.');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const cleanEmail = resetEmail.trim().toLowerCase();
+      const userData = getUserData(cleanEmail);
+      
+      if (!userData) {
+        setPasswordError('User account not found.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Update password
+      const updatedUserData = {
+        ...userData,
+        password: newPassword,
+        lastPasswordReset: new Date().toISOString()
+      };
+      
+      const saved = saveUserData(updatedUserData);
+      if (!saved) {
+        setPasswordError('Failed to update password. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Clean up reset token
+      localStorage.removeItem(`reset_token_${cleanEmail}`);
+      
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Auto-login with new password
+      localStorage.setItem('desiDestinationsEmail', cleanEmail);
+      onLogin(cleanEmail);
+      
+    } catch (error) {
+      console.error('Password reset error:', error);
+      setPasswordError('An error occurred while resetting password. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   // Handle proceeding to registration from user not found dialog
@@ -399,9 +520,22 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
               <ForgotPasswordForm
                 resetEmail={resetEmail}
                 resetLinkSent={resetLinkSent}
+                resetToken={resetToken}
+                newPassword={newPassword}
+                confirmPassword={confirmPassword}
+                showNewPassword={showNewPassword}
+                showConfirmPassword={showConfirmPassword}
+                passwordError={passwordError}
+                tokenExpiry={tokenExpiry}
                 isLoading={isLoading}
                 onEmailChange={setResetEmail}
+                onNewPasswordChange={setNewPassword}
+                onConfirmPasswordChange={setConfirmPassword}
+                onToggleNewPassword={() => setShowNewPassword(!showNewPassword)}
+                onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
                 onSubmit={handleForgotPassword}
+                onResetPassword={handleResetPassword}
+                onUseResetLink={handleUseResetLink}
                 onBackToLogin={() => switchToMode('login')}
               />
             )}
