@@ -6,6 +6,7 @@ import ForgotPasswordForm from './auth/ForgotPasswordForm';
 import UserNotFoundDialog from './auth/UserNotFoundDialog';
 import ImageGallery from './auth/ImageGallery';
 import AuthHeader from './auth/AuthHeader';
+import { DataCleanup } from '../utils/dataCleanup';
 
 interface LoginFormContainerProps {
   onLogin: (email: string) => void;
@@ -47,20 +48,47 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
-  // Clear specific problematic email on component mount
+  // Check for corrupted data on component mount and clean if necessary
   React.useEffect(() => {
-    const problematicEmail = 'susmita.work@gmail.com';
-    const cleanEmail = problematicEmail.toLowerCase();
-    
-    // Remove any stored data for this specific email
-    localStorage.removeItem(`desiDestinations_user_${cleanEmail}`);
-    
-    // If this email is currently set as logged in, clear it
-    const currentLoggedEmail = localStorage.getItem('desiDestinationsEmail');
-    if (currentLoggedEmail && currentLoggedEmail.toLowerCase() === cleanEmail) {
-      localStorage.removeItem('desiDestinationsEmail');
+    try {
+      // Check if there's any corrupted data that might prevent login
+      const stats = DataCleanup.getDataStats();
+      const loginStatus = DataCleanup.canAnyUserLogin();
+      
+      console.log('Login form mounted - Data stats:', stats);
+      console.log('Login status:', loginStatus);
+      
+      // If there are user accounts but they can't login, there might be corruption
+      if (stats.userAccounts > 0 && !loginStatus.canLogin) {
+        console.warn('Detected potential data corruption - users exist but cannot login');
+      }
+      
+      // Check for specific problematic entries
+      const allKeys = Object.keys(localStorage);
+      const problematicKeys = allKeys.filter(key => 
+        key.includes('undefined') || 
+        key.includes('null') || 
+        key.length > 200 // Unusually long keys might indicate corruption
+      );
+      
+      if (problematicKeys.length > 0) {
+        console.warn('Found problematic localStorage keys:', problematicKeys);
+        // Clean up problematic keys
+        problematicKeys.forEach(key => {
+          try {
+            localStorage.removeItem(key);
+            console.log('Removed problematic key:', key);
+          } catch (error) {
+            console.error('Failed to remove problematic key:', key, error);
+          }
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error during data integrity check:', error);
     }
   }, []);
+
   // Beautiful Indian destinations and cultural images
   const indianImages = [
     {
@@ -131,23 +159,64 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     clearErrors();
   };
 
-  // Check if user exists in localStorage
+  // Check if user exists in localStorage with enhanced error handling
   const getUserData = (email: string): UserData | null => {
     try {
       const cleanEmail = email.trim().toLowerCase();
       const userData = localStorage.getItem(`desiDestinations_user_${cleanEmail}`);
-      return userData ? JSON.parse(userData) : null;
+      
+      if (!userData) {
+        return null;
+      }
+      
+      const parsed = JSON.parse(userData);
+      
+      // Validate the parsed data structure
+      if (!parsed || typeof parsed !== 'object' || !parsed.email || !parsed.password) {
+        console.warn('Invalid user data structure found for:', cleanEmail);
+        // Remove corrupted data
+        localStorage.removeItem(`desiDestinations_user_${cleanEmail}`);
+        return null;
+      }
+      
+      return parsed;
     } catch (error) {
-      console.error('Error reading user data:', error);
+      console.error('Error reading user data for:', email, error);
+      // If there's an error parsing, remove the corrupted data
+      try {
+        const cleanEmail = email.trim().toLowerCase();
+        localStorage.removeItem(`desiDestinations_user_${cleanEmail}`);
+      } catch (removeError) {
+        console.error('Failed to remove corrupted user data:', removeError);
+      }
       return null;
     }
   };
 
-  // Save user data to localStorage
+  // Save user data to localStorage with enhanced error handling
   const saveUserData = (userData: UserData): boolean => {
     try {
       const cleanEmail = userData.email.trim().toLowerCase();
-      localStorage.setItem(`desiDestinations_user_${cleanEmail}`, JSON.stringify(userData));
+      const dataToSave = JSON.stringify(userData);
+      
+      // Validate the data before saving
+      if (!userData.email || !userData.password || !userData.name) {
+        console.error('Invalid user data - missing required fields');
+        return false;
+      }
+      
+      localStorage.setItem(`desiDestinations_user_${cleanEmail}`, dataToSave);
+      
+      // Verify the data was saved correctly
+      const savedData = localStorage.getItem(`desiDestinations_user_${cleanEmail}`);
+      if (!savedData) {
+        console.error('Failed to verify saved user data');
+        return false;
+      }
+      
+      // Try to parse it to ensure it's valid
+      JSON.parse(savedData);
+      
       return true;
     } catch (error) {
       console.error('Error saving user data:', error);
@@ -155,7 +224,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     }
   };
 
-  // Handle login form submission
+  // Handle login form submission with enhanced error handling
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
@@ -187,7 +256,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       
       if (!userData) {
         // User doesn't exist - show user not found dialog
-        clearErrors(); // Clear any existing errors
+        clearErrors();
         setMode('userNotFound');
         setIsLoading(false);
         return;
@@ -199,9 +268,17 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
         return;
       }
       
-      // Successful login
-      localStorage.setItem('desiDestinationsEmail', cleanEmail);
-      onLogin(cleanEmail);
+      // Successful login - set session
+      try {
+        localStorage.setItem('desiDestinationsEmail', cleanEmail);
+        onLogin(cleanEmail);
+      } catch (sessionError) {
+        console.error('Failed to set login session:', sessionError);
+        setPasswordError('Login successful but failed to save session. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+      
     } catch (error) {
       console.error('Login error:', error);
       setPasswordError('An error occurred during login. Please try again.');
@@ -210,7 +287,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     setIsLoading(false);
   };
 
-  // Handle registration form submission
+  // Handle registration form submission with enhanced validation
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
@@ -281,8 +358,17 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       }
 
       // Auto-login after successful registration
-      localStorage.setItem('desiDestinationsEmail', cleanEmail);
-      onLogin(cleanEmail);
+      try {
+        localStorage.setItem('desiDestinationsEmail', cleanEmail);
+        onLogin(cleanEmail);
+      } catch (sessionError) {
+        console.error('Registration successful but failed to auto-login:', sessionError);
+        setPasswordError('Account created successfully! Please sign in.');
+        switchToMode('login');
+        setIsLoading(false);
+        return;
+      }
+      
     } catch (error) {
       console.error('Registration error:', error);
       setPasswordError('An error occurred during registration. Please try again.');
@@ -319,22 +405,28 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
 
     setIsLoading(true);
     
-    // Generate reset token and expiry (15 minutes)
+    // Generate reset token and expiry (1 minute)
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     const token = `reset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const expiry = new Date(Date.now() + 1 * 60 * 1000); // 1 minute from now
     
     // Store reset token with expiry
-    localStorage.setItem(`reset_token_${cleanEmail}`, JSON.stringify({
-      token,
-      expiry: expiry.toISOString(),
-      email: cleanEmail
-    }));
-    
-    setResetLinkSent(true);
-    setIsLoading(false);
-    clearErrors(); // Clear any previous errors
+    try {
+      localStorage.setItem(`reset_token_${cleanEmail}`, JSON.stringify({
+        token,
+        expiry: expiry.toISOString(),
+        email: cleanEmail
+      }));
+      
+      setResetLinkSent(true);
+      setIsLoading(false);
+      clearErrors();
+    } catch (error) {
+      console.error('Failed to save reset token:', error);
+      setPasswordError('Failed to generate reset link. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   // Switch between different modes

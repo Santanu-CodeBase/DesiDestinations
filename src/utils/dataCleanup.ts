@@ -38,6 +38,23 @@ export class DataCleanup {
         errors.push(`Failed to clear localStorage: ${error}`);
       }
       
+      // Also clear sessionStorage for complete cleanup
+      try {
+        sessionStorage.clear();
+        console.log('sessionStorage.clear() executed');
+      } catch (error) {
+        errors.push(`Failed to clear sessionStorage: ${error}`);
+      }
+      
+      // Clear any cached data
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            caches.delete(name);
+          });
+        });
+      }
+      
       // Verify cleanup was successful
       const finalKeys = Object.keys(localStorage);
       console.log('Cleanup complete. Remaining keys:', finalKeys);
@@ -86,7 +103,9 @@ export class DataCleanup {
       const userDataKeys = allKeys.filter(key => 
         key.startsWith('desiDestinations') ||
         key.toLowerCase().includes('user') ||
-        key.toLowerCase().includes('auth')
+        key.toLowerCase().includes('auth') ||
+        key.includes('searchHistory') ||
+        key.includes('notifications')
       );
       
       const searchHistory = localStorage.getItem('searchHistory');
@@ -137,28 +156,51 @@ export class DataCleanup {
       
       // Get all keys before clearing
       const allKeys = Object.keys(localStorage);
+      const sessionKeys = Object.keys(sessionStorage);
       console.log('All localStorage keys before reset:', allKeys);
+      console.log('All sessionStorage keys before reset:', sessionKeys);
       
       // Clear everything multiple times to ensure it's gone
       localStorage.clear();
+      sessionStorage.clear();
       
       // Remove each key individually as backup
       allKeys.forEach(key => {
         try {
           localStorage.removeItem(key);
         } catch (error) {
-          console.error(`Error removing key ${key}:`, error);
+          console.error(`Error removing localStorage key ${key}:`, error);
+        }
+      });
+      
+      sessionKeys.forEach(key => {
+        try {
+          sessionStorage.removeItem(key);
+        } catch (error) {
+          console.error(`Error removing sessionStorage key ${key}:`, error);
         }
       });
       
       // Clear again
       localStorage.clear();
+      sessionStorage.clear();
       
-      console.log('localStorage cleared completely');
+      console.log('All storage cleared completely');
+      
+      // Clear any cached data
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            caches.delete(name);
+          });
+        });
+      }
       
       // Verify it's empty
-      const remainingKeys = Object.keys(localStorage);
-      console.log('Remaining keys after clear:', remainingKeys);
+      const remainingLocalKeys = Object.keys(localStorage);
+      const remainingSessionKeys = Object.keys(sessionStorage);
+      console.log('Remaining localStorage keys after clear:', remainingLocalKeys);
+      console.log('Remaining sessionStorage keys after clear:', remainingSessionKeys);
       
       // Force page reload to reset React state
       setTimeout(() => {
@@ -200,14 +242,16 @@ export class DataCleanup {
   } {
     try {
       const allKeys = Object.keys(localStorage);
-      const isClean = allKeys.length === 0;
+      const sessionKeys = Object.keys(sessionStorage);
+      const totalKeys = [...allKeys, ...sessionKeys];
+      const isClean = totalKeys.length === 0;
       
       return {
         isClean,
-        remainingItems: allKeys,
+        remainingItems: totalKeys,
         message: isClean 
           ? 'Database is completely clean - no data exists' 
-          : `Database contains ${allKeys.length} items: ${allKeys.join(', ')}`
+          : `Database contains ${totalKeys.length} items: ${totalKeys.join(', ')}`
       };
     } catch (error) {
       return {
@@ -249,6 +293,56 @@ export class DataCleanup {
         currentSession: null,
         message: `Check failed: ${error}`
       };
+    }
+  }
+
+  /**
+   * Emergency cleanup - removes all data and forces app restart
+   */
+  static emergencyCleanup(): void {
+    try {
+      console.log('EMERGENCY CLEANUP INITIATED');
+      
+      // Clear all storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear IndexedDB if available
+      if ('indexedDB' in window) {
+        indexedDB.databases().then(databases => {
+          databases.forEach(db => {
+            if (db.name) {
+              indexedDB.deleteDatabase(db.name);
+            }
+          });
+        }).catch(console.error);
+      }
+      
+      // Clear all caches
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            caches.delete(name);
+          });
+        }).catch(console.error);
+      }
+      
+      // Clear cookies (if possible)
+      document.cookie.split(";").forEach(cookie => {
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      });
+      
+      console.log('Emergency cleanup completed - forcing reload');
+      
+      // Force immediate reload
+      window.location.href = window.location.origin;
+      
+    } catch (error) {
+      console.error('Emergency cleanup failed:', error);
+      // Last resort - force reload anyway
+      window.location.reload();
     }
   }
 }
