@@ -78,20 +78,20 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-          <Mic className="h-6 w-6 text-orange-600 mr-2" />
+      <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-gray-700/50">
+        <h2 className="text-2xl font-bold text-gray-100 mb-6 flex items-center">
+          <Mic className="h-6 w-6 text-orange-400 mr-2" />
           Voice Search
         </h2>
 
         <div className="text-center space-y-6">
           {/* Recording Area */}
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-8">
+          <div className="bg-gradient-to-br from-gray-700/30 to-gray-600/30 rounded-2xl p-8 border border-gray-600/50 backdrop-blur-sm">
             <div className="flex flex-col items-center space-y-4">
               <div className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
                 isRecording 
-                  ? 'bg-red-500 animate-pulse' 
-                  : 'bg-orange-500 hover:bg-orange-600'
+                  ? 'bg-gradient-to-r from-red-500 to-pink-500 animate-pulse shadow-2xl' 
+                  : 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-xl'
               }`}>
                 {isRecording ? (
                   <MicOff className="h-10 w-10 text-white" />
@@ -103,22 +103,22 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
               <div className="text-center">
                 {isRecording ? (
                   <div>
-                    <p className="text-lg font-medium text-gray-900">Recording...</p>
-                    <p className="text-3xl font-bold text-red-600 mt-2">
+                    <p className="text-lg font-medium text-gray-100">Recording...</p>
+                    <p className="text-3xl font-bold text-red-400 mt-2">
                       {formatTime(recordingTime)}
                     </p>
                   </div>
                 ) : hasRecording ? (
                   <div>
-                    <p className="text-lg font-medium text-gray-900">Recording Ready</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-lg font-medium text-gray-100">Recording Ready</p>
+                    <p className="text-sm text-gray-300">
                       Duration: {formatTime(recordingTime)}
                     </p>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-lg font-medium text-gray-900">Ready to Record</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-lg font-medium text-gray-100">Ready to Record</p>
+                    <p className="text-sm text-gray-300">
                       Tap to start voice search
                     </p>
                   </div>
@@ -132,7 +132,7 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
             {!isRecording && !hasRecording && (
               <button
                 onClick={startRecording}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center space-x-2 shadow-lg"
               >
                 <Mic className="h-5 w-5" />
                 <span>Start Recording</span>
@@ -142,7 +142,7 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
             {isRecording && (
               <button
                 onClick={stopRecording}
-                className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center space-x-2 shadow-lg"
               >
                 <MicOff className="h-5 w-5" />
                 <span>Stop Recording</span>
@@ -154,7 +154,7 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
                 <button
                   onClick={playRecording}
                   disabled={isPlaying}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 disabled:opacity-50"
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-4 py-3 rounded-lg font-medium transition-all flex items-center space-x-2 disabled:opacity-50 shadow-lg"
                 >
                   {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                   <span>{isPlaying ? 'Playing...' : 'Play'}</span>
@@ -162,7 +162,7 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
                 
                 <button
                   onClick={processVoiceNote}
-                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center space-x-2 shadow-lg"
                 >
                   <Volume2 className="h-5 w-5" />
                   <span>Process & Search</span>
@@ -173,7 +173,7 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
                     setHasRecording(false);
                     setRecordingTime(0);
                   }}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                  className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-4 py-3 rounded-lg font-medium transition-all shadow-lg"
                 >
                   Clear
                 </button>
@@ -183,19 +183,19 @@ const VoiceNotes: React.FC<VoiceNotesProps> = ({ onSearchComplete }) => {
 
           {isProcessing && (
             <div className="flex flex-col items-center space-y-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
-              <p className="text-gray-600">Processing your voice note...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-400"></div>
+              <p className="text-gray-300">Processing your voice note...</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="bg-orange-50 rounded-2xl p-6 border border-orange-200">
-        <h3 className="text-lg font-semibold text-orange-900 mb-3">
+      <div className="bg-gradient-to-br from-orange-500/10 to-amber-500/10 rounded-2xl p-6 border border-orange-500/30 backdrop-blur-sm">
+        <h3 className="text-lg font-semibold text-orange-300 mb-3">
           How to use Voice Search
         </h3>
-        <ul className="text-sm text-orange-800 space-y-2">
+        <ul className="text-sm text-orange-200/90 space-y-2">
           <li>• Speak naturally about your travel plans</li>
           <li>• Mention destinations, dates, and preferences</li>
           <li>• Example: "I want to visit Kerala and Goa from December 15th to 20th"</li>
