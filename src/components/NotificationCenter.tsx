@@ -44,27 +44,27 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-gray-700/50">
-        <h2 className="text-2xl font-bold text-gray-100 mb-6 flex items-center">
-          <Bell className="h-6 w-6 text-orange-400 mr-2" />
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+          <Bell className="h-6 w-6 text-orange-600 mr-2" />
           Notifications
         </h2>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-6 bg-gray-700/50 rounded-lg p-1">
+        <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
           <button
             onClick={() => setActiveTab('inbox')}
             className={`flex-1 py-2 px-4 rounded-md font-medium text-sm transition-colors ${
               activeTab === 'inbox'
-                ? 'bg-orange-500/20 text-orange-300 shadow-lg border border-orange-500/30'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-white text-orange-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
               <Inbox className="h-4 w-4" />
               <span>Inbox</span>
               {unreadNotifications.length > 0 && (
-                <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {unreadNotifications.length}
                 </span>
               )}
@@ -74,14 +74,14 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
             onClick={() => setActiveTab('outbox')}
             className={`flex-1 py-2 px-4 rounded-md font-medium text-sm transition-colors ${
               activeTab === 'outbox'
-                ? 'bg-orange-500/20 text-orange-300 shadow-lg border border-orange-500/30'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-white text-orange-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
               <Send className="h-4 w-4" />
               <span>Outbox</span>
-              <span className="text-xs text-gray-400">({readNotifications.length})</span>
+              <span className="text-xs text-gray-500">({readNotifications.length})</span>
             </div>
           </button>
         </div>
@@ -91,29 +91,29 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
           <div className="space-y-3">
             {unreadNotifications.length === 0 ? (
               <div className="text-center py-12">
-                <Inbox className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                <p className="text-gray-400">No new notifications</p>
-                <p className="text-sm text-gray-500 mt-1">You're all caught up!</p>
+                <Inbox className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No new notifications</p>
+                <p className="text-sm text-gray-400 mt-1">You're all caught up!</p>
               </div>
             ) : (
               unreadNotifications.map(notification => (
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className="p-4 bg-gray-700/30 border border-orange-500/30 rounded-lg hover:bg-orange-500/10 hover:border-orange-400/50 cursor-pointer transition-all backdrop-blur-sm"
+                  className="p-4 border border-orange-200 rounded-lg hover:bg-orange-50 cursor-pointer transition-colors"
                 >
                   <div className="flex items-start space-x-3">
                     <div className="text-xl">{getNotificationIcon(notification.type)}</div>
                     <div className="flex-1">
-                      <p className="text-gray-100 font-medium">{notification.message}</p>
+                      <p className="text-gray-900 font-medium">{notification.message}</p>
                       <div className="flex items-center space-x-2 mt-1">
-                        <Clock className="h-3 w-3 text-gray-500" />
-                        <span className="text-xs text-gray-400">
+                        <Clock className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">
                           {formatNotificationTime(notification.timestamp)}
                         </span>
                       </div>
                     </div>
-                    <div className="w-2 h-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full shadow-lg"></div>
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                   </div>
                 </div>
               ))
@@ -126,22 +126,22 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
           <div className="space-y-3">
             {readNotifications.length === 0 ? (
               <div className="text-center py-12">
-                <Send className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                <p className="text-gray-400">No read notifications</p>
+                <Send className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No read notifications</p>
               </div>
             ) : (
               readNotifications.map(notification => (
                 <div
                   key={notification.id}
-                  className="p-4 border border-gray-600/50 rounded-lg bg-gray-700/20 backdrop-blur-sm"
+                  className="p-4 border border-gray-200 rounded-lg bg-gray-50"
                 >
                   <div className="flex items-start space-x-3">
                     <div className="text-xl opacity-60">{getNotificationIcon(notification.type)}</div>
                     <div className="flex-1">
-                      <p className="text-gray-300">{notification.message}</p>
+                      <p className="text-gray-600">{notification.message}</p>
                       <div className="flex items-center space-x-2 mt-1">
-                        <Check className="h-3 w-3 text-green-400" />
-                        <span className="text-xs text-gray-400">
+                        <Check className="h-3 w-3 text-green-500" />
+                        <span className="text-xs text-gray-500">
                           Read {formatNotificationTime(notification.timestamp)}
                         </span>
                       </div>

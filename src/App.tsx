@@ -115,27 +115,27 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
       {/* Header */}
-      <header className="bg-gray-800/95 backdrop-blur-md shadow-xl border-b-2 border-orange-500/30 relative z-30">
+      <header className="bg-white shadow-sm border-b-2 border-orange-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="p-2 rounded-lg hover:bg-orange-500/20 transition-colors lg:hidden"
+                className="p-2 rounded-lg hover:bg-orange-50 transition-colors lg:hidden"
               >
-                {sidebarCollapsed ? <Menu className="h-5 w-5 text-orange-400" /> : <X className="h-5 w-5 text-orange-400" />}
+                {sidebarCollapsed ? <Menu className="h-5 w-5 text-orange-600" /> : <X className="h-5 w-5 text-orange-600" />}
               </button>
               <Logo size="md" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">DesiDestinations</h1>
+              <h1 className="text-2xl font-bold text-gray-900">DesiDestinations</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-300">Namaste, <span className="text-orange-400 font-medium">{userEmail.split('@')[0]}</span>!</span>
+              <span className="text-sm text-gray-600">Namaste, <span className="text-orange-600 font-medium">{userEmail.split('@')[0]}</span>!</span>
               {isAdmin && (
                 <button
                   onClick={() => setShowAdminPanel(true)}
-                  className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1 bg-cyan-500/10 px-3 py-1 rounded-lg border border-cyan-500/20 hover:border-cyan-400/30 transition-all"
+                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center space-x-1"
                 >
                   <Settings className="h-4 w-4" />
                   <span>Admin</span>
@@ -143,7 +143,7 @@ function App() {
               )}
               <button
                 onClick={handleLogout}
-                className="text-sm text-red-400 hover:text-red-300 font-medium bg-red-500/10 px-3 py-1 rounded-lg border border-red-500/20 hover:border-red-400/30 transition-all"
+                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
               >
                 Logout
               </button>
@@ -154,23 +154,23 @@ function App() {
 
       <div className="flex">
         {/* Sidebar Navigation */}
-        <nav className={`fixed lg:relative inset-y-0 left-0 z-20 bg-gray-800/95 backdrop-blur-md border-r border-gray-700/50 shadow-2xl lg:shadow-none transition-all duration-300 ease-in-out ${
+        <nav className={`fixed lg:relative inset-y-0 left-0 z-20 bg-white border-r border-gray-200 shadow-lg lg:shadow-none transition-all duration-300 ease-in-out ${
           sidebarCollapsed ? 'w-16 lg:w-16' : 'w-64 lg:w-64'
         } ${sidebarCollapsed ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'}`}>
           <div className="flex flex-col h-full pt-16 lg:pt-0">
             {/* Sidebar Header */}
-            <div className={`flex items-center justify-between p-4 border-b border-gray-700/50 ${sidebarCollapsed ? 'lg:justify-center' : ''}`}>
+            <div className={`flex items-center justify-between p-4 border-b border-gray-200 ${sidebarCollapsed ? 'lg:justify-center' : ''}`}>
               {!sidebarCollapsed && (
-                <h2 className="text-lg font-semibold text-gray-100">Navigation</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Navigation</h2>
               )}
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className={`p-2 rounded-lg hover:bg-gray-700/50 transition-colors ${sidebarCollapsed ? 'lg:block hidden' : ''}`}
+                className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${sidebarCollapsed ? 'lg:block hidden' : ''}`}
               >
                 {sidebarCollapsed ? (
-                  <Menu className="h-5 w-5 text-gray-400" />
+                  <Menu className="h-5 w-5 text-gray-500" />
                 ) : (
-                  <ChevronLeft className="h-5 w-5 text-gray-400" />
+                  <ChevronLeft className="h-5 w-5 text-gray-500" />
                 )}
               </button>
             </div>
@@ -193,19 +193,19 @@ function App() {
                   }}
                   className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium text-sm transition-all duration-200 group relative ${
                     activeTab === id
-                      ? 'text-orange-300'
-                      : 'text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                      ? 'text-orange-600'
+                      : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                   }`}
                   title={sidebarCollapsed ? label : ''}
                 >
                   <div className={`relative p-2.5 rounded-xl transition-all duration-200 ${
                     activeTab === id 
-                      ? 'bg-gradient-to-br from-orange-500/30 to-amber-500/30 shadow-lg' 
-                      : 'bg-gray-700/40 group-hover:bg-gray-600/50'
+                      ? 'bg-gradient-to-br from-orange-100 to-amber-100 shadow-lg' 
+                      : 'bg-gray-100 group-hover:bg-gray-200'
                   }`}>
-                    <Icon className={`h-6 w-6 ${activeTab === id ? 'text-orange-300' : 'text-gray-400 group-hover:text-gray-200'}`} />
+                    <Icon className={`h-6 w-6 ${activeTab === id ? 'text-orange-600' : 'text-gray-500 group-hover:text-gray-700'}`} />
                     {id === 'notifications' && unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -213,11 +213,11 @@ function App() {
                   {!sidebarCollapsed && (
                     <div className="flex-1 text-left">
                       <div className="font-medium">{label}</div>
-                      <div className={`text-xs mt-0.5 ${activeTab === id ? 'text-orange-400/70' : 'text-gray-500'}`}>{description}</div>
+                      <div className={`text-xs mt-0.5 ${activeTab === id ? 'text-orange-500' : 'text-gray-400'}`}>{description}</div>
                     </div>
                   )}
                   {sidebarCollapsed && (
-                    <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900/95 backdrop-blur-md text-orange-300 text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 border border-gray-700/50 shadow-xl">
+                    <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl">
                       {label}
                     </div>
                   )}
@@ -227,25 +227,25 @@ function App() {
 
             {/* Admin Panel Link */}
             {isAdmin && (
-              <div className="border-t border-gray-700/50 p-3">
+              <div className="border-t border-gray-200 p-3">
                 <button
                   onClick={() => setShowAdminPanel(true)}
-                  className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium text-sm transition-all duration-200 group text-cyan-400 hover:bg-cyan-500/20 ${
+                  className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium text-sm transition-all duration-200 group text-indigo-600 hover:bg-indigo-50 ${
                     sidebarCollapsed ? 'justify-center' : ''
                   }`}
                   title={sidebarCollapsed ? 'Admin Panel' : ''}
                 >
-                  <div className="relative p-2.5 rounded-xl bg-cyan-500/20 transition-all duration-200 group-hover:bg-cyan-500/30 shadow-lg">
-                    <Settings className="h-6 w-6 text-cyan-300" />
+                  <div className="relative p-2.5 rounded-xl bg-indigo-100 transition-all duration-200 group-hover:bg-indigo-200 shadow-lg">
+                    <Settings className="h-6 w-6 text-indigo-600" />
                   </div>
                   {!sidebarCollapsed && (
                     <div className="flex-1 text-left">
                       <div className="font-medium">Admin Panel</div>
-                      <div className="text-xs text-cyan-400/70 mt-0.5">Manage system</div>
+                      <div className="text-xs text-indigo-500 mt-0.5">Manage system</div>
                     </div>
                   )}
                   {sidebarCollapsed && (
-                    <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900/95 backdrop-blur-md text-cyan-300 text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 border border-gray-700/50 shadow-xl">
+                    <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl">
                       Admin Panel
                     </div>
                   )}
@@ -258,7 +258,7 @@ function App() {
         {/* Overlay for mobile */}
         {!sidebarCollapsed && (
           <div 
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-10 lg:hidden"
+            className="fixed inset-0 bg-black/50 z-10 lg:hidden"
             onClick={() => setSidebarCollapsed(true)}
           />
         )}
