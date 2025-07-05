@@ -66,27 +66,27 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     {
       url: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Taj Mahal, Agra - Symbol of Eternal Love',
-      description: 'Marvel at the pristine white marble mausoleum, an architectural masterpiece and UNESCO World Heritage Site that stands as an eternal symbol of love'
+      description: 'Experience the breathtaking beauty of the Taj Mahal, a pristine white marble mausoleum built by Emperor Shah Jahan as an eternal symbol of love for his wife Mumtaz Mahal. This UNESCO World Heritage Site showcases exquisite Mughal architecture with intricate inlay work and perfect symmetry.'
     },
     {
       url: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Kerala Backwaters - God\'s Own Country',
-      description: 'Drift through tranquil backwaters on traditional houseboats, surrounded by emerald paddy fields and swaying coconut palms in Kerala\'s pristine waterways'
+      description: 'Glide through Kerala\'s serene backwaters on traditional houseboats called "kettuvallams". Navigate through a network of tranquil canals, lagoons, and lakes surrounded by lush green paddy fields, coconut groves, and traditional villages that showcase the authentic rural life of God\'s Own Country.'
     },
     {
       url: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Rajasthan Desert - Golden Sands of Time',
-      description: 'Experience the mystical beauty of the Thar Desert with endless golden sand dunes, camel safaris, and magical starlit nights in Rajasthan\'s royal landscape'
+      description: 'Venture into the vast Thar Desert where endless golden sand dunes stretch to the horizon. Experience the magic of camel safaris, witness spectacular sunsets, and sleep under a canopy of stars in luxury desert camps while enjoying traditional Rajasthani folk music and dance.'
     },
     {
       url: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Himalayas - Crown of the World',
-      description: 'Stand in awe of majestic snow-capped peaks that pierce the sky, offering breathtaking views and spiritual serenity in the world\'s highest mountain range'
+      description: 'Witness the majestic Himalayan peaks rising dramatically into the sky, offering some of the world\'s most spectacular mountain vistas. From snow-capped summits to alpine meadows, experience spiritual serenity, adventure trekking, and the pure mountain air of the world\'s highest mountain range.'
     },
     {
       url: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Goa Beaches - Coastal Paradise',
-      description: 'Relax on pristine golden beaches where palm trees sway gently and crystal-clear waters meet the shore, creating the perfect tropical paradise'
+      description: 'Discover Goa\'s stunning coastline with pristine golden beaches fringed by swaying palm trees. Enjoy crystal-clear waters perfect for swimming, vibrant beach shacks serving fresh seafood, water sports, and the laid-back coastal lifestyle that makes Goa India\'s premier beach destination.'
     }
   ];
 

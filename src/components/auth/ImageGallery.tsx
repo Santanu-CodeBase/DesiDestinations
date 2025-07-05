@@ -13,11 +13,11 @@ interface ImageGalleryProps {
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Rotate images every 25 seconds
+  // Rotate images every 30 seconds for better viewing
   useEffect(() => {
     const imageTimer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 25000);
+    }, 30000);
     return () => clearInterval(imageTimer);
   }, [images.length]);
 
@@ -25,27 +25,29 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
     <div className="w-3/5 relative overflow-hidden">
       {/* Background Image with Overlay */}
       <div 
-        className="absolute inset-0 bg-cover bg-center transition-all duration-[2000ms] ease-in-out"
+        className="absolute inset-0 bg-cover bg-center transition-all duration-[3000ms] ease-in-out"
         style={{
           backgroundImage: `url(${images[currentImageIndex].url})`,
         }}
       >
-        {/* Warmer Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-orange-800/10 to-red-900/30"></div>
+        {/* Enhanced Gradient Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-black/50"></div>
       </div>
 
       {/* Content Overlay */}
       <div className="relative h-full flex flex-col justify-between p-8">
         
-        {/* Image Caption Tile */}
+        {/* Image Caption Tile - Enhanced for better visibility */}
         <div className="mt-auto">
-          <div className="bg-gradient-to-r from-amber-900/90 to-orange-900/90 backdrop-blur-md rounded-2xl p-6 text-white border border-amber-300/20 shadow-2xl">
-            <h3 className="text-2xl font-bold mb-3">{images[currentImageIndex].caption}</h3>
-            <p className="text-base opacity-95 mb-4 leading-relaxed">
+          <div className="bg-gradient-to-r from-black/80 to-black/70 backdrop-blur-lg rounded-2xl p-6 text-white border border-white/20 shadow-2xl">
+            <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-lg">
+              {images[currentImageIndex].caption}
+            </h3>
+            <p className="text-base text-white/95 mb-4 leading-relaxed drop-shadow-md">
               {images[currentImageIndex].description}
             </p>
             
-            {/* Image Indicators */}
+            {/* Image Indicators with better visibility */}
             <div className="flex space-x-2">
               {images.map((_, index) => (
                 <button
@@ -53,8 +55,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                   onClick={() => setCurrentImageIndex(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-500 ${
                     index === currentImageIndex 
-                      ? 'bg-amber-300 scale-125 shadow-lg' 
-                      : 'bg-white/40 hover:bg-white/60'
+                      ? 'bg-white scale-125 shadow-lg' 
+                      : 'bg-white/50 hover:bg-white/70'
                   }`}
                 />
               ))}
@@ -66,13 +68,13 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
         <div className="absolute bottom-4 left-8 right-8">
           <div className="flex justify-end">
             <div className="flex items-center space-x-8 text-xs">
-              <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
+              <button className="text-white/90 hover:text-white font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
                 Accessibility
               </button>
-              <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
+              <button className="text-white/90 hover:text-white font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
                 Privacy Policy
               </button>
-              <button className="text-white hover:text-amber-300 font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl">
+              <button className="text-white/90 hover:text-white font-medium transition-colors drop-shadow-lg hover:drop-shadow-xl bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
                 Terms & Conditions
               </button>
             </div>
