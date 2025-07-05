@@ -198,10 +198,14 @@ function App() {
                   }`}
                   title={sidebarCollapsed ? label : ''}
                 >
-                  <div className="relative">
-                    <Icon className={`h-5 w-5 ${activeTab === id ? 'text-orange-400' : 'text-gray-500 group-hover:text-gray-300'}`} />
+                  <div className={`relative p-2.5 rounded-xl transition-all duration-200 ${
+                    activeTab === id 
+                      ? 'bg-gradient-to-br from-orange-500/30 to-amber-500/30 shadow-lg border border-orange-400/40' 
+                      : 'bg-gray-700/40 group-hover:bg-gray-600/50 border border-gray-600/30 group-hover:border-gray-500/40'
+                  }`}>
+                    <Icon className={`h-6 w-6 ${activeTab === id ? 'text-orange-300' : 'text-gray-400 group-hover:text-gray-200'}`} />
                     {id === 'notifications' && unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-lg">
+                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg border-2 border-gray-800">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -231,7 +235,9 @@ function App() {
                   }`}
                   title={sidebarCollapsed ? 'Admin Panel' : ''}
                 >
-                  <Settings className="h-5 w-5" />
+                  <div className="relative p-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400/30 transition-all duration-200 group-hover:bg-cyan-500/30 group-hover:border-cyan-300/40 shadow-lg">
+                    <Settings className="h-6 w-6 text-cyan-300" />
+                  </div>
                   {!sidebarCollapsed && (
                     <div className="flex-1 text-left">
                       <div className="font-medium">Admin Panel</div>
