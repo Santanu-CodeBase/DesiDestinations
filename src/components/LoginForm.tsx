@@ -69,7 +69,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       description: 'Marvel at the pristine white marble mausoleum, an architectural masterpiece and UNESCO World Heritage Site that stands as an eternal symbol of love'
     },
     {
-      url: 'https://images.pexels.com/photos/2413613/pexels-photo-2413613.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Kerala Backwaters - God\'s Own Country',
       description: 'Drift through tranquil backwaters on traditional houseboats, surrounded by emerald paddy fields and swaying coconut palms in Kerala\'s pristine waterways'
     },
@@ -79,12 +79,12 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       description: 'Experience the mystical beauty of the Thar Desert with endless golden sand dunes, camel safaris, and magical starlit nights in Rajasthan\'s royal landscape'
     },
     {
-      url: 'https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Himalayas - Crown of the World',
       description: 'Stand in awe of majestic snow-capped peaks that pierce the sky, offering breathtaking views and spiritual serenity in the world\'s highest mountain range'
     },
     {
-      url: 'https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Goa Beaches - Coastal Paradise',
       description: 'Relax on pristine golden beaches where palm trees sway gently and crystal-clear waters meet the shore, creating the perfect tropical paradise'
     }
