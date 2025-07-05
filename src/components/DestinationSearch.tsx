@@ -186,7 +186,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
             {/* To Destination */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                To Destination
+                To
               </label>
               <div className="relative">
                 {toDestination ? (
@@ -350,7 +350,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           </div>
           
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for To destination:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for To:</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {popularDestinations.map(dest => (
                 <button
