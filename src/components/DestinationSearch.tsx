@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, MapPin, Calendar, Plane, Train, Bus, Car, Clock, IndianRupee, Star, ArrowRight } from 'lucide-react';
+import { Search, MapPin, Calendar, Plane, Train, Bus, Car, Clock, IndianRupee, Star, ArrowRight, Camera, MapPin as ActivityIcon } from 'lucide-react';
 import { SearchRecord } from '../types';
 
 interface DestinationSearchProps {
@@ -15,6 +15,12 @@ interface TravelOption {
   recommended: boolean;
 }
 
+interface DestinationActivity {
+  name: string;
+  description: string;
+  image: string;
+  category: string;
+}
 const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete }) => {
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
@@ -23,6 +29,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<TravelOption[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [destinationActivities, setDestinationActivities] = useState<DestinationActivity[]>([]);
 
   // Get today's date and max date (90 days from now)
   const today = new Date().toISOString().split('T')[0];
@@ -34,6 +41,237 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     'Pune', 'Ahmedabad', 'Jaipur', 'Goa', 'Kerala', 'Rajasthan'
   ];
 
+  // Get top activities for destination
+  const getDestinationActivities = (destination: string): DestinationActivity[] => {
+    const activitiesDatabase: { [key: string]: DestinationActivity[] } = {
+      'Delhi': [
+        {
+          name: 'Red Fort',
+          description: 'Historic Mughal fortress and UNESCO World Heritage Site',
+          image: 'https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'India Gate',
+          description: 'War memorial and iconic landmark of New Delhi',
+          image: 'https://images.pexels.com/photos/1098460/pexels-photo-1098460.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Monument'
+        },
+        {
+          name: 'Lotus Temple',
+          description: 'Stunning Baháʼí House of Worship with unique architecture',
+          image: 'https://images.pexels.com/photos/2846217/pexels-photo-2846217.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Spiritual'
+        },
+        {
+          name: 'Chandni Chowk',
+          description: 'Bustling market street with authentic street food',
+          image: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Shopping'
+        },
+        {
+          name: 'Humayun\'s Tomb',
+          description: 'Beautiful Mughal garden tomb, precursor to Taj Mahal',
+          image: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        }
+      ],
+      'Mumbai': [
+        {
+          name: 'Gateway of India',
+          description: 'Iconic arch monument overlooking the Arabian Sea',
+          image: 'https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Monument'
+        },
+        {
+          name: 'Marine Drive',
+          description: 'Scenic waterfront promenade known as Queen\'s Necklace',
+          image: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Scenic'
+        },
+        {
+          name: 'Bollywood Studios',
+          description: 'Behind-the-scenes tour of India\'s film industry',
+          image: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Entertainment'
+        },
+        {
+          name: 'Elephanta Caves',
+          description: 'Ancient rock-cut caves dedicated to Lord Shiva',
+          image: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'Crawford Market',
+          description: 'Vibrant market for fresh produce and local goods',
+          image: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Shopping'
+        }
+      ],
+      'Goa': [
+        {
+          name: 'Baga Beach',
+          description: 'Popular beach with water sports and vibrant nightlife',
+          image: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Beach'
+        },
+        {
+          name: 'Basilica of Bom Jesus',
+          description: 'UNESCO World Heritage Site with Portuguese architecture',
+          image: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'Dudhsagar Falls',
+          description: 'Spectacular four-tiered waterfall in the Western Ghats',
+          image: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Nature'
+        },
+        {
+          name: 'Spice Plantations',
+          description: 'Guided tours through aromatic spice gardens',
+          image: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Nature'
+        },
+        {
+          name: 'Anjuna Flea Market',
+          description: 'Bohemian market with handicrafts and local art',
+          image: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Shopping'
+        }
+      ],
+      'Kerala': [
+        {
+          name: 'Backwater Cruise',
+          description: 'Serene houseboat journey through palm-fringed canals',
+          image: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Nature'
+        },
+        {
+          name: 'Tea Plantations',
+          description: 'Rolling hills covered with lush green tea gardens',
+          image: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Nature'
+        },
+        {
+          name: 'Kathakali Performance',
+          description: 'Traditional dance-drama with elaborate costumes',
+          image: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Cultural'
+        },
+        {
+          name: 'Spice Markets',
+          description: 'Aromatic markets selling cardamom, pepper, and cinnamon',
+          image: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Shopping'
+        },
+        {
+          name: 'Ayurvedic Spa',
+          description: 'Traditional wellness treatments and massages',
+          image: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Wellness'
+        }
+      ],
+      'Rajasthan': [
+        {
+          name: 'Desert Safari',
+          description: 'Camel rides through golden sand dunes of Thar Desert',
+          image: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Adventure'
+        },
+        {
+          name: 'Amber Fort',
+          description: 'Majestic hilltop fort with stunning architecture',
+          image: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'City Palace',
+          description: 'Opulent royal residence with museums and courtyards',
+          image: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'Folk Dance Shows',
+          description: 'Colorful Rajasthani cultural performances',
+          image: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Cultural'
+        },
+        {
+          name: 'Handicraft Markets',
+          description: 'Traditional textiles, jewelry, and artwork',
+          image: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Shopping'
+        }
+      ],
+      'Jaipur': [
+        {
+          name: 'Hawa Mahal',
+          description: 'Palace of Winds with intricate pink sandstone facade',
+          image: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'Amber Fort',
+          description: 'Magnificent fort complex with elephant rides',
+          image: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'City Palace',
+          description: 'Royal residence with museums and courtyards',
+          image: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        },
+        {
+          name: 'Johari Bazaar',
+          description: 'Famous jewelry market in the Pink City',
+          image: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Shopping'
+        },
+        {
+          name: 'Jantar Mantar',
+          description: 'UNESCO World Heritage astronomical observatory',
+          image: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=400',
+          category: 'Historical'
+        }
+      ]
+    };
+
+    // Return activities for the destination, or generic activities if not found
+    return activitiesDatabase[destination] || [
+      {
+        name: 'Local Sightseeing',
+        description: 'Explore the main attractions and landmarks',
+        image: 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=400',
+        category: 'General'
+      },
+      {
+        name: 'Cultural Experience',
+        description: 'Immerse in local traditions and customs',
+        image: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg?auto=compress&cs=tinysrgb&w=400',
+        category: 'Cultural'
+      },
+      {
+        name: 'Local Cuisine',
+        description: 'Taste authentic regional dishes and specialties',
+        image: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=400',
+        category: 'Food'
+      },
+      {
+        name: 'Shopping',
+        description: 'Browse local markets and specialty stores',
+        image: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=400',
+        category: 'Shopping'
+      },
+      {
+        name: 'Photography',
+        description: 'Capture beautiful moments and scenic views',
+        image: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=400',
+        category: 'Photography'
+      }
+    ];
+  };
   // Travel recommendation engine
   const generateTravelRecommendations = (from: string, to: string): TravelOption[] => {
     // Calculate approximate distance (simplified logic)
@@ -131,6 +369,11 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     // Generate travel recommendations
     const recommendations = generateTravelRecommendations(source, destination);
     setSearchResults(recommendations);
+    
+    // Get destination activities
+    const activities = getDestinationActivities(destination);
+    setDestinationActivities(activities);
+    
     setShowResults(true);
 
     // Create search record for history
@@ -363,6 +606,55 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         </div>
       )}
 
+      {/* Destination Activities */}
+      {showResults && destinationActivities.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-purple-100">
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <Camera className="h-5 w-5 text-purple-600 mr-2" />
+            Top 5 Activities in {destination}
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {destinationActivities.map((activity, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl overflow-hidden border border-purple-200 hover:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <div className="relative">
+                  <img
+                    src={activity.image}
+                    alt={activity.name}
+                    className="w-full h-32 object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=400';
+                    }}
+                  />
+                  <div className="absolute top-2 right-2">
+                    <span className="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      {activity.category}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-gray-900 text-sm mb-1 flex items-center">
+                    <ActivityIcon className="h-3 w-3 text-purple-600 mr-1" />
+                    {activity.name}
+                  </h4>
+                  <p className="text-xs text-gray-600 line-clamp-2">
+                    {activity.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+            <p className="text-sm text-purple-800 text-center">
+              ✨ <strong>Pro Tip:</strong> Book activities in advance for better prices and availability during peak season!
+            </p>
+          </div>
+        </div>
+      )}
       {/* Popular Destinations */}
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
