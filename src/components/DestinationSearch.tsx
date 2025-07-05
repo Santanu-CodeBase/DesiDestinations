@@ -183,9 +183,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                   className="flex items-center space-x-1 px-3 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
                   title="Swap destinations"
                 >
-                  <ArrowRight className="h-4 w-4" />
                   <span className="font-medium">Swap</span>
-                  <ArrowRight className="h-4 w-4 transform rotate-180" />
                 </button>
               </div>
               <div className="relative">
