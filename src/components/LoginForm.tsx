@@ -542,6 +542,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
                 showNewPassword={showNewPassword}
                 showConfirmPassword={showConfirmPassword}
                 passwordError={passwordError}
+                emailError={emailError}
                 tokenExpiry={tokenExpiry}
                 isLoading={isLoading}
                 onEmailChange={setResetEmail}

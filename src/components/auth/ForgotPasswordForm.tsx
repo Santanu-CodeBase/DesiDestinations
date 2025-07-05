@@ -10,6 +10,7 @@ interface ForgotPasswordFormProps {
   showNewPassword: boolean;
   showConfirmPassword: boolean;
   passwordError: string;
+  emailError: string;
   tokenExpiry: Date | null;
   isLoading: boolean;
   onEmailChange: (email: string) => void;
@@ -32,6 +33,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   showNewPassword,
   showConfirmPassword,
   passwordError,
+  emailError,
   tokenExpiry,
   isLoading,
   onEmailChange,
@@ -198,9 +200,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                 <button
                   type="button"
                   onClick={onBackToLogin}
-                  className="text-gray-600 hover:text-gray-700 font-medium text-sm"
+                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
                 >
-                  Cancel Reset
+                  ← Back to Email
                 </button>
               </div>
             </form>
@@ -271,12 +273,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                   autoComplete="email"
                 />
               </div>
-              {passwordError && (
+              {(passwordError || emailError) && (
                 <p className="text-red-500 text-sm flex items-center">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
-                  {passwordError}
+                  {passwordError || emailError}
                 </p>
               )}
             </div>
