@@ -536,7 +536,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
     // Car/Road option
     options.push({
-      mode: 'Car/Road',
+      mode: 'Car Rental / Drive',
       icon: Car,
       duration: distance > 1000 ? '12-20 hours' : distance > 500 ? '6-12 hours' : '2-6 hours',
       cost: distance > 1000 ? '₹3,000-6,000' : distance > 500 ? '₹1,500-3,000' : '₹500-1,500',
