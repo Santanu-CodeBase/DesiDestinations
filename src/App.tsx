@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, MapPin, Calendar, Bell, History, Mic } from 'lucide-react';
+import { User, MapPin, Calendar, Bell, History, Mic, Settings } from 'lucide-react';
 import Logo from './components/Logo';
 import LoginForm from './components/LoginForm';
 import DestinationSearch from './components/DestinationSearch';
@@ -7,6 +7,7 @@ import SearchHistory from './components/SearchHistory';
 import NotificationCenter from './components/NotificationCenter';
 import BookingLinks from './components/BookingLinks';
 import VoiceNotes from './components/VoiceNotes';
+import AdminPanel from './components/admin/AdminPanel';
 import { SearchRecord, NotificationItem } from './types';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
   const [searchHistory, setSearchHistory] = useState<SearchRecord[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -86,8 +88,15 @@ function App() {
     localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
   };
 
+  // Check for admin access (simple check - in production use proper auth)
+  const isAdmin = userEmail === 'admin@desidestinations.com';
+
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
+  }
+
+  if (showAdminPanel && isAdmin) {
+    return <AdminPanel />;
   }
 
   return (
@@ -102,6 +111,15 @@ function App() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Namaste, {userEmail.split('@')[0]}!</span>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowAdminPanel(true)}
+                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center space-x-1"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Admin</span>
+                </button>
+              )}
               <button
                 onClick={handleLogout}
                 className="text-sm text-orange-600 hover:text-orange-700 font-medium"
@@ -123,8 +141,8 @@ function App() {
               { id: 'notifications', label: 'Notifications', icon: Bell },
               { id: 'voice', label: 'Voice', icon: Mic }
             ].map(({ id, label, icon: Icon }) => (
+              <div key={id} className="relative">
               <button
-                key={id}
                 onClick={() => setActiveTab(id)}
                 className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === id
@@ -140,7 +158,16 @@ function App() {
                   </span>
                 )}
               </button>
+              </div>
             ))}
+            {showAdminPanel && isAdmin && (
+              <button
+                onClick={() => setShowAdminPanel(false)}
+                className="flex items-center space-x-2 py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm"
+              >
+                <span>← Back to App</span>
+              </button>
+            )}
           </div>
         </div>
       </nav>
