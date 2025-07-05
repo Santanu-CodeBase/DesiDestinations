@@ -298,10 +298,12 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     clearErrors();
     
     if (!resetEmail.trim()) {
+      setEmailError('Email is required');
       return;
     }
 
     if (!validateEmail(resetEmail)) {
+      setEmailError('Please enter a valid email address');
       return;
     }
 
@@ -310,7 +312,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     const userData = getUserData(cleanEmail);
     
     if (!userData) {
-      setEmailError('No account found with this email address.');
+      setPasswordError('No account found with this email address.');
+      setIsLoading(false);
       return;
     }
 
@@ -331,6 +334,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     
     setResetLinkSent(true);
     setIsLoading(false);
+    clearErrors(); // Clear any previous errors
   };
 
   // Switch between different modes
@@ -340,6 +344,8 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     setResetLinkSent(false);
     setResetToken(null);
     setTokenExpiry(null);
+    setNewPassword('');
+    setConfirmPassword('');
     setMode(newMode);
   };
 
@@ -349,7 +355,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     const resetData = localStorage.getItem(`reset_token_${cleanEmail}`);
     
     if (!resetData) {
-      setEmailError('Reset link not found. Please generate a new one.');
+      setPasswordError('Reset link not found. Please generate a new one.');
       return;
     }
     
@@ -359,7 +365,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       
       if (new Date() > expiryDate) {
         localStorage.removeItem(`reset_token_${cleanEmail}`);
-        setEmailError('Reset link has expired. Please generate a new one.');
+        setPasswordError('Reset link has expired. Please generate a new one.');
         setResetLinkSent(false);
         return;
       }
@@ -370,7 +376,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       setConfirmPassword('');
       clearErrors();
     } catch (error) {
-      setEmailError('Invalid reset link. Please generate a new one.');
+      setPasswordError('Invalid reset link. Please generate a new one.');
     }
   };
 
@@ -437,6 +443,16 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       setPasswordError('An error occurred while resetting password. Please try again.');
       setIsLoading(false);
     }
+  };
+
+  // Handle clearing password error when switching back to email input
+  const handleBackToEmailInput = () => {
+    setResetLinkSent(false);
+    setResetToken(null);
+    setTokenExpiry(null);
+    setNewPassword('');
+    setConfirmPassword('');
+    clearErrors();
   };
 
   // Handle proceeding to registration from user not found dialog
@@ -536,7 +552,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
                 onSubmit={handleForgotPassword}
                 onResetPassword={handleResetPassword}
                 onUseResetLink={handleUseResetLink}
-                onBackToLogin={() => switchToMode('login')}
+                onBackToLogin={resetToken ? handleBackToEmailInput : () => switchToMode('login')}
               />
             )}
 
