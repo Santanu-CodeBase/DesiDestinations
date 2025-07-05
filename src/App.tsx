@@ -193,19 +193,19 @@ function App() {
                   }}
                   className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium text-sm transition-all duration-200 group relative ${
                     activeTab === id
-                      ? 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 shadow-lg border border-orange-500/30'
+                      ? 'text-orange-300'
                       : 'text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
                   }`}
                   title={sidebarCollapsed ? label : ''}
                 >
                   <div className={`relative p-2.5 rounded-xl transition-all duration-200 ${
                     activeTab === id 
-                      ? 'bg-gradient-to-br from-orange-500/30 to-amber-500/30 shadow-lg border border-orange-400/40' 
-                      : 'bg-gray-700/40 group-hover:bg-gray-600/50 border border-gray-600/30 group-hover:border-gray-500/40'
+                      ? 'bg-gradient-to-br from-orange-500/30 to-amber-500/30 shadow-lg' 
+                      : 'bg-gray-700/40 group-hover:bg-gray-600/50'
                   }`}>
                     <Icon className={`h-6 w-6 ${activeTab === id ? 'text-orange-300' : 'text-gray-400 group-hover:text-gray-200'}`} />
                     {id === 'notifications' && unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg border-2 border-gray-800">
+                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -230,12 +230,12 @@ function App() {
               <div className="border-t border-gray-700/50 p-3">
                 <button
                   onClick={() => setShowAdminPanel(true)}
-                  className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium text-sm transition-all duration-200 group text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/30 ${
+                  className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium text-sm transition-all duration-200 group text-cyan-400 hover:bg-cyan-500/20 ${
                     sidebarCollapsed ? 'justify-center' : ''
                   }`}
                   title={sidebarCollapsed ? 'Admin Panel' : ''}
                 >
-                  <div className="relative p-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400/30 transition-all duration-200 group-hover:bg-cyan-500/30 group-hover:border-cyan-300/40 shadow-lg">
+                  <div className="relative p-2.5 rounded-xl bg-cyan-500/20 transition-all duration-200 group-hover:bg-cyan-500/30 shadow-lg">
                     <Settings className="h-6 w-6 text-cyan-300" />
                   </div>
                   {!sidebarCollapsed && (
