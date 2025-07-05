@@ -82,7 +82,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
           <Search className="h-6 w-6 text-orange-600 mr-2" />
-          Start Your Journey
+          What's in your mind today?
         </h2>
 
         {/* Destination Selection */}
