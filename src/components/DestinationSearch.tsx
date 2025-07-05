@@ -45,24 +45,81 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
   // Function to calculate travel recommendations based on source and destination
   const getTravelRecommendation = (source: string, destination: string) => {
-    // Mock distance calculation (in real app, use Google Maps API or similar)
-    const mockDistances: { [key: string]: number } = {
-      'Delhi-Mumbai': 1400,
-      'Mumbai-Delhi': 1400,
-      'Bangalore-Chennai': 350,
-      'Chennai-Bangalore': 350,
-      'Kolkata-Delhi': 1500,
-      'Delhi-Kolkata': 1500,
-      'Mumbai-Goa': 600,
-      'Goa-Mumbai': 600,
-      'Delhi-Jaipur': 280,
-      'Jaipur-Delhi': 280,
-      'Chennai-Kerala': 700,
-      'Kerala-Chennai': 700,
+    // Enhanced distance calculation with more routes
+    const calculateDistance = (src: string, dest: string) => {
+      const routes: { [key: string]: number } = {
+        // Major city pairs
+        'Delhi-Mumbai': 1400, 'Mumbai-Delhi': 1400,
+        'Delhi-Bangalore': 2150, 'Bangalore-Delhi': 2150,
+        'Delhi-Chennai': 2180, 'Chennai-Delhi': 2180,
+        'Delhi-Kolkata': 1500, 'Kolkata-Delhi': 1500,
+        'Delhi-Hyderabad': 1570, 'Hyderabad-Delhi': 1570,
+        'Delhi-Pune': 1450, 'Pune-Delhi': 1450,
+        'Delhi-Ahmedabad': 950, 'Ahmedabad-Delhi': 950,
+        'Delhi-Jaipur': 280, 'Jaipur-Delhi': 280,
+        'Delhi-Chandigarh': 250, 'Chandigarh-Delhi': 250,
+        
+        'Mumbai-Bangalore': 980, 'Bangalore-Mumbai': 980,
+        'Mumbai-Chennai': 1340, 'Chennai-Mumbai': 1340,
+        'Mumbai-Kolkata': 1950, 'Kolkata-Mumbai': 1950,
+        'Mumbai-Hyderabad': 710, 'Hyderabad-Mumbai': 710,
+        'Mumbai-Pune': 150, 'Pune-Mumbai': 150,
+        'Mumbai-Goa': 600, 'Goa-Mumbai': 600,
+        'Mumbai-Ahmedabad': 530, 'Ahmedabad-Mumbai': 530,
+        
+        'Bangalore-Chennai': 350, 'Chennai-Bangalore': 350,
+        'Bangalore-Hyderabad': 570, 'Hyderabad-Bangalore': 570,
+        'Bangalore-Kochi': 460, 'Kochi-Bangalore': 460,
+        'Bangalore-Mysore': 150, 'Mysore-Bangalore': 150,
+        
+        'Chennai-Hyderabad': 630, 'Hyderabad-Chennai': 630,
+        'Chennai-Kochi': 700, 'Kochi-Chennai': 700,
+        'Chennai-Kerala': 700, 'Kerala-Chennai': 700,
+        'Chennai-Madurai': 460, 'Madurai-Chennai': 460,
+        
+        'Kolkata-Bhubaneswar': 440, 'Bhubaneswar-Kolkata': 440,
+        'Kolkata-Guwahati': 1000, 'Guwahati-Kolkata': 1000,
+        
+        // State to state distances
+        'Rajasthan-Gujarat': 400, 'Gujarat-Rajasthan': 400,
+        'Kerala-Tamil Nadu': 300, 'Tamil Nadu-Kerala': 300,
+        'Karnataka-Kerala': 200, 'Kerala-Karnataka': 200,
+        'Maharashtra-Goa': 450, 'Goa-Maharashtra': 450,
+        'Himachal Pradesh-Punjab': 200, 'Punjab-Himachal Pradesh': 200,
+        'Uttarakhand-Delhi': 300, 'Delhi-Uttarakhand': 300,
+      };
+      
+      const routeKey = `${src}-${dest}`;
+      if (routes[routeKey]) return routes[routeKey];
+      
+      // Try reverse route
+      const reverseKey = `${dest}-${src}`;
+      if (routes[reverseKey]) return routes[reverseKey];
+      
+      // Calculate based on region proximity
+      const northStates = ['Delhi', 'Punjab', 'Haryana', 'Himachal Pradesh', 'Uttarakhand', 'Uttar Pradesh', 'Rajasthan', 'Jammu and Kashmir', 'Ladakh'];
+      const southStates = ['Karnataka', 'Tamil Nadu', 'Kerala', 'Andhra Pradesh', 'Telangana'];
+      const westStates = ['Maharashtra', 'Gujarat', 'Goa', 'Rajasthan'];
+      const eastStates = ['West Bengal', 'Odisha', 'Jharkhand', 'Bihar', 'Assam', 'Meghalaya', 'Tripura', 'Manipur', 'Mizoram', 'Nagaland', 'Arunachal Pradesh'];
+      
+      const getRegion = (place: string) => {
+        if (northStates.some(state => place.includes(state) || state.includes(place))) return 'north';
+        if (southStates.some(state => place.includes(state) || state.includes(place))) return 'south';
+        if (westStates.some(state => place.includes(state) || state.includes(place))) return 'west';
+        if (eastStates.some(state => place.includes(state) || state.includes(place))) return 'east';
+        return 'central';
+      };
+      
+      const srcRegion = getRegion(src);
+      const destRegion = getRegion(dest);
+      
+      if (srcRegion === destRegion) return 300; // Same region
+      if ((srcRegion === 'north' && destRegion === 'south') || (srcRegion === 'south' && destRegion === 'north')) return 1800;
+      if ((srcRegion === 'east' && destRegion === 'west') || (srcRegion === 'west' && destRegion === 'east')) return 1500;
+      return 800; // Default for other combinations
     };
 
-    const routeKey = `${source}-${destination}`;
-    const distance = mockDistances[routeKey] || 500; // Default distance
+    const distance = calculateDistance(source, destination);
 
     // Determine best travel mode based on distance and route popularity
     if (distance > 1000) {
@@ -145,11 +202,15 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
     setIsSearching(true);
     
+    // Clear previous recommendation
+    setTravelRecommendation(null);
+    
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Generate travel recommendation
     const recommendation = getTravelRecommendation(source.trim(), destination.trim());
+    console.log('Generated recommendation:', recommendation); // Debug log
     setTravelRecommendation(recommendation);
 
     const selectedDestinations = [source, destination];
@@ -172,11 +233,11 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     onSearchComplete(searchRecord);
     setIsSearching(false);
     
-    // Reset form
-    setSource('');
-    setDestination('');
-    setStartDate('');
-    setEndDate('');
+    // Don't reset form after search so user can see their selection
+    // setSource('');
+    // setDestination('');
+    // setStartDate('');
+    // setEndDate('');
   };
 
   return (
