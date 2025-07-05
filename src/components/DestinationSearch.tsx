@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Plus, X, Star, Train, Plane, Bus, Car, Lightbulb, Info, Waves, ArrowRight, Building, TreePine, Utensils, Mountain, Camera, Clock, Route, IndianRupee } from 'lucide-react';
+import { Search, Calendar, MapPin, Plus, X, Star, ExternalLink, Clock, DollarSign, Zap, Award, TrendingUp, Users } from 'lucide-react';
 import Logo from './Logo';
 import { indianDestinations } from '../data/destinations';
 import { SearchRecord } from '../types';
@@ -18,6 +18,8 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'tiles'>('list');
   const [travelRecommendations, setTravelRecommendations] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'row' | 'tile'>('row');
   const [destinationActivities, setDestinationActivities] = useState<any>({});
@@ -500,6 +502,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
     onSearchComplete(searchRecord);
     setIsSearching(false);
+    setShowResults(true);
     
     // Reset form
     setFromDestination('');
@@ -508,6 +511,54 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     setEndDate('');
   };
 
+  // Mock travel options data
+  const generateTravelOptions = () => {
+    const routes = [
+      {
+        id: 'route-1',
+        name: 'Express Journey',
+        type: 'Flight + Train',
+        duration: '8h 30m',
+        cost: '₹12,500',
+        recommendation: 'Best Overall',
+        score: 92,
+        pros: ['Fastest route', 'Good connectivity', 'Comfortable'],
+        cons: ['Higher cost'],
+        analysis: 'Perfect balance of speed and comfort with excellent connectivity between destinations.',
+        bookingUrl: 'https://www.makemytrip.com',
+        provider: 'MakeMyTrip'
+      },
+      {
+        id: 'route-2',
+        name: 'Budget Explorer',
+        type: 'Bus + Train',
+        duration: '14h 45m',
+        cost: '₹4,200',
+        recommendation: 'Best Value',
+        score: 85,
+        pros: ['Most economical', 'Scenic route', 'Multiple stops'],
+        cons: ['Longer duration', 'Less comfort'],
+        analysis: 'Ideal for budget travelers who enjoy the journey as much as the destination.',
+        bookingUrl: 'https://www.redbus.in',
+        provider: 'RedBus'
+      },
+      {
+        id: 'route-3',
+        name: 'Luxury Experience',
+        type: 'Premium Flight',
+        duration: '5h 15m',
+        cost: '₹28,900',
+        recommendation: 'Most Comfortable',
+        score: 88,
+        pros: ['Premium comfort', 'Fastest option', 'Excellent service'],
+        cons: ['Expensive', 'Limited flexibility'],
+        analysis: 'Ultimate comfort and speed for travelers who prioritize luxury and time savings.',
+        bookingUrl: 'https://www.airindia.in',
+        provider: 'Air India'
+      }
+    ];
+    return routes;
+  };
   const popularDestinations = ['Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Tamil Nadu', 'Karnataka', 'Uttarakhand', 'Maharashtra'];
 
   return (
@@ -708,15 +759,216 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 <span>Searching...</span>
               </>
+      {/* Travel Options Results */}
+      {showResults && (
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center">
+              <TrendingUp className="h-5 w-5 text-orange-600 mr-2" />
+              Travel Options
+            </h3>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'list' 
+                    ? 'bg-orange-100 text-orange-700' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                List
+              </button>
+              <button
+                onClick={() => setViewMode('tiles')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'tiles' 
+                    ? 'bg-orange-100 text-orange-700' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Tiles
+              </button>
+            </div>
+          </div>
             ) : (
+          <div className={viewMode === 'tiles' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}>
+            {generateTravelOptions().map((option) => (
+              <div
+                key={option.id}
+                onClick={() => handleBookingClick(option)}
+                className={`border border-gray-200 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-lg hover:border-orange-300 group ${
+                  viewMode === 'tiles' ? 'p-4' : 'p-3'
+                }`}
+              >
+                {viewMode === 'tiles' ? (
+                  // Tile View
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900 group-hover:text-orange-700 transition-colors">
+                          {option.name}
+                        </h4>
+                        <p className="text-sm text-gray-600">{option.type}</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-lg font-bold ${getScoreColor(option.score)}`}>
+                          {option.score}
+                        </span>
+                        <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-orange-500 transition-colors" />
+                      </div>
+                    </div>
               <>
+                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getRecommendationColor(option.recommendation)}`}>
+                      <Award className="h-3 w-3 mr-1" />
+                      {option.recommendation}
+                    </div>
                 <Search className="h-5 w-5" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm text-gray-700">{option.duration}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <DollarSign className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-900">{option.cost}</span>
+                      </div>
+                    </div>
                 <span>Search Journey</span>
+                    <div className="space-y-2">
+                      <div>
+                        <h5 className="text-xs font-medium text-green-700 mb-1">Pros:</h5>
+                        <div className="flex flex-wrap gap-1">
+                          {option.pros.map((pro, index) => (
+                            <span key={index} className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">
+                              {pro}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <h5 className="text-xs font-medium text-red-700 mb-1">Cons:</h5>
+                        <div className="flex flex-wrap gap-1">
+                          {option.cons.map((con, index) => (
+                            <span key={index} className="text-xs bg-red-50 text-red-700 px-2 py-1 rounded">
+                              {con}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
               </>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <h5 className="text-xs font-medium text-blue-900 mb-1 flex items-center">
+                        <Zap className="h-3 w-3 mr-1" />
+                        Smart Analysis
+                      </h5>
+                      <p className="text-xs text-blue-800">{option.analysis}</p>
+                    </div>
             )}
+                    <button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-2 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all flex items-center justify-center space-x-2 group-hover:shadow-md">
+                      <span>Book with {option.provider}</span>
+                      <ExternalLink className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  // List View
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h4 className="font-medium text-gray-900 group-hover:text-orange-700 transition-colors truncate">
+                          {option.name}
+                        </h4>
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getRecommendationColor(option.recommendation)} hidden sm:flex`}>
+                          <Award className="h-3 w-3 mr-1" />
+                          {option.recommendation}
+                        </span>
+                        <span className={`text-sm font-bold ${getScoreColor(option.score)} hidden lg:block`}>
+                          {option.score}/100
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <span className="flex items-center space-x-1">
+                          <Users className="h-4 w-4" />
+                          <span>{option.type}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Clock className="h-4 w-4" />
+                          <span>{option.duration}</span>
+                        </span>
+                        <span className="flex items-center space-x-1 font-medium text-gray-900">
+                          <DollarSign className="h-4 w-4" />
+                          <span>{option.cost}</span>
+                        </span>
+                      </div>
+                      
+                      <div className="mt-2 hidden lg:block">
+                        <div className="bg-blue-50 p-2 rounded">
+                          <p className="text-xs text-blue-800 line-clamp-2">{option.analysis}</p>
+                        </div>
+                      </div>
+                    </div>
           </button>
+                    <div className="flex items-center space-x-3 ml-4">
+                      <div className="hidden sm:flex flex-col space-y-1">
+                        <div className="flex flex-wrap gap-1 justify-end">
+                          {option.pros.slice(0, 2).map((pro, index) => (
+                            <span key={index} className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">
+                              {pro}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-2 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all flex items-center space-x-2 group-hover:shadow-md whitespace-nowrap">
+                        <span className="hidden sm:inline">Book Now</span>
+                        <span className="sm:hidden">Book</span>
+                        <ExternalLink className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              💡 Click any option to book directly with the provider
+            </p>
+          </div>
+        </div>
+      )}
       </div>
+      {/* Top Activities Section */}
+      {showResults && (
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <Star className="h-5 w-5 text-orange-600 mr-2" />
+            Top Activities at Your Destinations
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {selectedDestinations.slice(0, 2).map(dest => {
+              const destData = indianDestinations.find(d => d.name === dest);
+              return (
+                <div key={dest} className="space-y-3">
+                  <h4 className="font-semibold text-gray-900 flex items-center">
+                    <MapPin className="h-4 w-4 text-orange-600 mr-2" />
+                    {dest}
+                  </h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    {destData?.activities.slice(0, 4).map(activity => (
+                      <div key={activity} className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                        <span className="text-sm font-medium text-orange-800">{activity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Popular Destinations */}
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
@@ -1073,7 +1325,27 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         </div>
       )}
 
+  const handleBookingClick = (option: any) => {
+    // Open booking URL in new tab
+    window.open(option.bookingUrl, '_blank', 'noopener,noreferrer');
+    
+    // Track the booking attempt (in a real app, you'd send this to analytics)
+    console.log('Booking clicked:', {
+      optionId: option.id,
+      provider: option.provider,
+      cost: option.cost,
+      destinations: selectedDestinations
+    });
+  };
 
+  const getRecommendationColor = (recommendation: string) => {
+    switch (recommendation) {
+      case 'Best Overall': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Best Value': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Most Comfortable': return 'bg-purple-100 text-purple-800 border-purple-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
       {/* Tips Section */}
       <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl shadow-lg p-6 border border-orange-100">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -1105,4 +1377,9 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   );
 };
 
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return 'text-green-600';
+    if (score >= 80) return 'text-blue-600';
+    return 'text-orange-600';
+  };
 export default DestinationSearch;
