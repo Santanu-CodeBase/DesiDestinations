@@ -173,7 +173,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 flex items-center">
             <Search className="h-6 w-6 text-orange-600 mr-2" />
-            Plan Your Journey
+            Where Do You Want to Go?
           </h2>
           {(source || destination || startDate || endDate) && (
             <button
