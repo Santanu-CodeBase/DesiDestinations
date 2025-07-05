@@ -192,58 +192,83 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Source Input */}
-              <div className="relative">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Source
                 </label>
-                <input
-                  type="text"
-                  value={activeField === 'source' ? searchTerm : source}
-                  onChange={(e) => handleInputChange(e.target.value, 'source')}
-                  onFocus={() => handleInputFocus('source')}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                  placeholder="Enter departure city..."
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={activeField === 'source' ? searchTerm : source}
+                    onChange={(e) => handleInputChange(e.target.value, 'source')}
+                    onFocus={() => handleInputFocus('source')}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                    placeholder="Enter departure city..."
+                  />
+                  
+                  {/* Source Suggestions */}
+                  {showSuggestions && searchTerm && activeField === 'source' && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredDestinations.map(dest => (
+                        <button
+                          key={dest.name}
+                          onClick={() => handleDestinationSelect(dest.name)}
+                          className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
+                        >
+                          <div>
+                            <span className="font-medium">{dest.name}</span>
+                            <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
+                          </div>
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                            {dest.type}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Destination Input */}
-              <div className="relative">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Destination
                 </label>
-                <input
-                  type="text"
-                  value={activeField === 'destination' ? searchTerm : destination}
-                  onChange={(e) => handleInputChange(e.target.value, 'destination')}
-                  onFocus={() => handleInputFocus('destination')}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                  placeholder="Enter destination city..."
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={activeField === 'destination' ? searchTerm : destination}
+                    onChange={(e) => handleInputChange(e.target.value, 'destination')}
+                    onFocus={() => handleInputFocus('destination')}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                    placeholder="Enter destination city..."
+                  />
+                  
+                  {/* Destination Suggestions */}
+                  {showSuggestions && searchTerm && activeField === 'destination' && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredDestinations.map(dest => (
+                        <button
+                          key={dest.name}
+                          onClick={() => handleDestinationSelect(dest.name)}
+                          className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
+                        >
+                          <div>
+                            <span className="font-medium">{dest.name}</span>
+                            <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
+                          </div>
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                            {dest.type}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            
-            {/* Suggestions Dropdown */}
-            {showSuggestions && searchTerm && activeField && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                {filteredDestinations.map(dest => (
-                  <button
-                    key={dest.name}
-                    onClick={() => handleDestinationSelect(dest.name)}
-                    className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
-                  >
-                    <div>
-                      <span className="font-medium">{dest.name}</span>
-                      <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
-                    </div>
-                    <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
-                      {dest.type}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Show selected source and destination */}
@@ -277,24 +302,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           )}
         </div>
 
-        <div className="space-y-4">
-          <div className="hidden">
-            <div className="relative">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setShowSuggestions(true);
-                }}
-                onFocus={() => setShowSuggestions(true)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                placeholder="Search states or cities..."
-              />
-              
-            </div>
-          </div>
-
+        <div className="space-y-4 mt-4">
           {/* Date Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
