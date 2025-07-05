@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Plus, X, Star, ExternalLink, Clock, DollarSign, Zap, Award, TrendingUp, Users, Lightbulb, Info, Camera, IndianRupee, ArrowRight } from 'lucide-react';
+import { Search, Calendar, MapPin, Plus, X, Star, ExternalLink, Clock, DollarSign, Zap, Award, TrendingUp, Users, Lightbulb, Info, Camera, IndianRupee, ArrowRight, Plane, Train, Bus, Car } from 'lucide-react';
 import Logo from './Logo';
 import { indianDestinations } from '../data/destinations';
 import { SearchRecord } from '../types';
@@ -17,6 +17,19 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const [endDate, setEndDate] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [travelRecommendation, setTravelRecommendation] = useState<{
+    mode: string;
+    duration: string;
+    cost: string;
+    icon: React.ComponentType<any>;
+    description: string;
+    alternatives: Array<{
+      mode: string;
+      duration: string;
+      cost: string;
+      icon: React.ComponentType<any>;
+    }>;
+  } | null>(null);
 
   const today = new Date();
   const maxDate = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000);
@@ -28,6 +41,71 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const formatDateDDMMYYYY = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+  };
+
+  // Function to calculate travel recommendations based on source and destination
+  const getTravelRecommendation = (source: string, destination: string) => {
+    // Mock distance calculation (in real app, use Google Maps API or similar)
+    const mockDistances: { [key: string]: number } = {
+      'Delhi-Mumbai': 1400,
+      'Mumbai-Delhi': 1400,
+      'Bangalore-Chennai': 350,
+      'Chennai-Bangalore': 350,
+      'Kolkata-Delhi': 1500,
+      'Delhi-Kolkata': 1500,
+      'Mumbai-Goa': 600,
+      'Goa-Mumbai': 600,
+      'Delhi-Jaipur': 280,
+      'Jaipur-Delhi': 280,
+      'Chennai-Kerala': 700,
+      'Kerala-Chennai': 700,
+    };
+
+    const routeKey = `${source}-${destination}`;
+    const distance = mockDistances[routeKey] || 500; // Default distance
+
+    // Determine best travel mode based on distance and route popularity
+    if (distance > 1000) {
+      // Long distance - recommend flight
+      return {
+        mode: 'Flight',
+        duration: '2-3 hours',
+        cost: '₹4,000-8,000',
+        icon: Plane,
+        description: 'Fastest option for long distances. Book in advance for better prices.',
+        alternatives: [
+          { mode: 'Train', duration: '12-20 hours', cost: '₹800-2,500', icon: Train },
+          { mode: 'Bus', duration: '15-24 hours', cost: '₹600-1,500', icon: Bus }
+        ]
+      };
+    } else if (distance > 500) {
+      // Medium distance - recommend train
+      return {
+        mode: 'Train',
+        duration: '6-12 hours',
+        cost: '₹500-1,800',
+        icon: Train,
+        description: 'Comfortable and economical for medium distances. Good connectivity.',
+        alternatives: [
+          { mode: 'Flight', duration: '1-2 hours', cost: '₹3,000-6,000', icon: Plane },
+          { mode: 'Bus', duration: '8-14 hours', cost: '₹400-1,000', icon: Bus },
+          { mode: 'Car', duration: '6-10 hours', cost: '₹2,000-4,000', icon: Car }
+        ]
+      };
+    } else {
+      // Short distance - recommend road/bus
+      return {
+        mode: 'Bus/Car',
+        duration: '3-6 hours',
+        cost: '₹200-800',
+        icon: Bus,
+        description: 'Most convenient for short distances. Flexible timing and routes.',
+        alternatives: [
+          { mode: 'Train', duration: '4-8 hours', cost: '₹300-800', icon: Train },
+          { mode: 'Flight', duration: '1 hour', cost: '₹2,500-5,000', icon: Plane }
+        ]
+      };
+    }
   };
 
   const filteredDestinations = indianDestinations.filter(dest =>
@@ -69,6 +147,10 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Generate travel recommendation
+    const recommendation = getTravelRecommendation(source.trim(), destination.trim());
+    setTravelRecommendation(recommendation);
 
     const selectedDestinations = [source, destination];
 
@@ -263,6 +345,95 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           </button>
         </div>
       </div>
+
+      {/* Travel Recommendations */}
+      {travelRecommendation && (
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-green-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Award className="h-5 w-5 text-green-600 mr-2" />
+            Recommended Travel Option
+          </h3>
+          
+          {/* Primary Recommendation */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border border-green-200">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-green-500 rounded-full text-white">
+                <travelRecommendation.icon className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-green-800">{travelRecommendation.mode}</h4>
+                <p className="text-green-700 text-sm mb-2">{travelRecommendation.description}</p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-green-600" />
+                    <span className="text-green-800 font-medium">{travelRecommendation.duration}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <IndianRupee className="h-4 w-4 text-green-600" />
+                    <span className="text-green-800 font-medium">{travelRecommendation.cost}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  Best Choice
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Alternative Options */}
+          <div>
+            <h4 className="text-md font-semibold text-gray-800 mb-3">Alternative Options</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {travelRecommendation.alternatives.map((alt, index) => (
+                <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-orange-300 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gray-400 rounded-full text-white">
+                      <alt.icon className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-medium text-gray-800">{alt.mode}</h5>
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <div className="flex items-center space-x-1">
+                          <Clock className="h-3 w-3" />
+                          <span>{alt.duration}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <IndianRupee className="h-3 w-3" />
+                          <span>{alt.cost}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Booking Links */}
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-800 mb-2 font-medium">Quick Booking Links:</p>
+            <div className="flex flex-wrap gap-2">
+              <a href="https://www.irctc.co.in" target="_blank" rel="noopener noreferrer" 
+                 className="text-xs bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600 transition-colors flex items-center space-x-1">
+                <Train className="h-3 w-3" />
+                <span>IRCTC</span>
+              </a>
+              <a href="https://www.redbus.in" target="_blank" rel="noopener noreferrer"
+                 className="text-xs bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 transition-colors flex items-center space-x-1">
+                <Bus className="h-3 w-3" />
+                <span>RedBus</span>
+              </a>
+              <a href="https://www.goindigo.in" target="_blank" rel="noopener noreferrer"
+                 className="text-xs bg-indigo-500 text-white px-3 py-1 rounded-full hover:bg-indigo-600 transition-colors flex items-center space-x-1">
+                <Plane className="h-3 w-3" />
+                <span>IndiGo</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Popular Destinations */}
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
