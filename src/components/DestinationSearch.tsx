@@ -790,7 +790,9 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                 return (
                   <div
                     key={index}
-                    className={`border rounded-lg p-4 hover:shadow-md transition-all duration-200 relative ${
+                    className={`border rounded-lg hover:shadow-md transition-all duration-200 relative ${
+                      viewMode === 'row' ? 'p-3' : 'p-4'
+                    } ${
                       viewMode === 'tile' ? 'h-full' : ''
                     } ${
                       option.isBestOption 
@@ -806,27 +808,29 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                       </div>
                     )}
 
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg ${
+                    <div className={`flex items-start justify-between ${viewMode === 'row' ? 'mb-2' : 'mb-3'}`}>
+                      <div className={`flex items-center ${viewMode === 'row' ? 'space-x-2' : 'space-x-3'}`}>
+                        <div className={`${viewMode === 'row' ? 'p-1.5' : 'p-2'} rounded-lg ${
                           option.isBestOption 
                             ? 'bg-green-100 text-green-600 border border-green-200' 
                             : colorClasses[option.color as keyof typeof colorClasses]
                         }`}>
-                          <IconComponent className="h-5 w-5" />
+                          <IconComponent className={`${viewMode === 'row' ? 'h-4 w-4' : 'h-5 w-5'}`} />
                         </div>
                         <div>
-                          <h4 className={`font-semibold ${
+                          <h4 className={`${viewMode === 'row' ? 'text-sm' : 'text-base'} font-semibold ${
                             option.isBestOption ? 'text-green-800' : 'text-gray-900'
                           }`}>
                             {option.name}
                             {option.isBestOption && (
-                              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                              <span className={`ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium ${
+                                viewMode === 'row' ? 'hidden sm:inline' : ''
+                              }`}>
                                 Best Choice
                               </span>
                             )}
                           </h4>
-                          <p className={`text-sm ${
+                          <p className={`${viewMode === 'row' ? 'text-xs' : 'text-sm'} ${
                             option.isBestOption ? 'text-green-700 font-medium' : 'text-gray-600'
                           }`}>
                             {option.recommendation}
@@ -834,7 +838,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                         </div>
                       </div>
                       {/* Score indicator */}
-                      <div className={`text-xs font-bold px-2 py-1 rounded-full ${
+                      <div className={`text-xs font-bold ${viewMode === 'row' ? 'px-1.5 py-0.5' : 'px-2 py-1'} rounded-full ${
                         option.isBestOption 
                           ? 'bg-green-200 text-green-800' 
                           : option.score >= 80 
@@ -848,29 +852,29 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                     </div>
 
                     {/* Smart Recommendation Panel - Integrated within each option */}
-                    <div className={`mb-4 p-3 rounded-lg border ${
+                    <div className={`${viewMode === 'row' ? 'mb-2 p-2' : 'mb-4 p-3'} rounded-lg border ${
                       option.isBestOption 
                         ? 'bg-green-50 border-green-200' 
                         : 'bg-blue-50 border-blue-200'
                     }`}>
-                      <div className="flex items-start space-x-2">
-                        <div className={`p-1.5 rounded-lg ${
+                      <div className={`flex items-start ${viewMode === 'row' ? 'space-x-1.5' : 'space-x-2'}`}>
+                        <div className={`${viewMode === 'row' ? 'p-1' : 'p-1.5'} rounded-lg ${
                           option.isBestOption ? 'bg-green-100' : 'bg-blue-100'
                         }`}>
-                          <Lightbulb className={`h-4 w-4 ${
+                          <Lightbulb className={`${viewMode === 'row' ? 'h-3 w-3' : 'h-4 w-4'} ${
                             option.isBestOption ? 'text-green-600' : 'text-blue-600'
                           }`} />
                         </div>
                         <div className="flex-1">
-                          <h5 className={`text-sm font-semibold mb-1 ${
+                          <h5 className={`${viewMode === 'row' ? 'text-xs' : 'text-sm'} font-semibold ${viewMode === 'row' ? 'mb-0.5' : 'mb-1'} ${
                             option.isBestOption ? 'text-green-800' : 'text-blue-800'
                           }`}>
                             {option.isBestOption ? 'Why This is Your Best Choice' : 'Smart Analysis'}
                           </h5>
-                          <div className={`text-xs space-y-1 ${
+                          <div className={`${viewMode === 'row' ? 'text-xs space-y-0.5' : 'text-xs space-y-1'} ${
                             option.isBestOption ? 'text-green-700' : 'text-blue-700'
                           }`}>
-                            <p>
+                            <p className={viewMode === 'row' ? 'line-clamp-2' : ''}>
                               <strong>Route Analysis:</strong> {
                                 isLongDistanceRoute(fromDestination, toDestination) 
                                   ? 'Long distance route - ' + (option.type === 'flight' ? 'flights are most efficient' : option.type === 'train' ? 'trains offer comfort for overnight travel' : option.type === 'bus' ? 'buses are budget-friendly but time-consuming' : 'driving requires multiple stops')
@@ -879,7 +883,8 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                                     : 'Medium distance route - ' + (option.type === 'train' ? 'ideal balance of comfort and time' : option.type === 'flight' ? 'good time savings' : option.type === 'bus' ? 'decent budget option' : 'flexible with scenic stops')
                               }
                             </p>
-                            <p>
+                            {viewMode === 'tile' && (
+                              <p>
                               <strong>Score Breakdown:</strong> {
                                 option.score >= 90 ? 'Excellent choice - optimal for your route with best time-cost balance' :
                                 option.score >= 85 ? 'Great option - well-suited considering distance and comfort factors' :
@@ -887,9 +892,10 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                                 option.score >= 70 ? 'Decent option - consider if other factors are important' :
                                 'Alternative option - may have specific advantages for your needs'
                               }
-                            </p>
+                              </p>
+                            )}
                             {option.isBestOption && (
-                              <p className="font-medium">
+                              <p className={`font-medium ${viewMode === 'row' ? 'hidden sm:block' : ''}`}>
                                 ⭐ <strong>Recommended:</strong> This option provides the best overall experience for your {fromDestination} to {toDestination} journey.
                               </p>
                             )}
@@ -897,24 +903,26 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+                    
+                    {/* Duration and Cost - Optimized for list view */}
+                    <div className={`grid grid-cols-2 ${viewMode === 'row' ? 'gap-2 mb-2' : 'gap-4 mb-4'}`}>
                       <div>
-                        <div className="flex items-center space-x-1 text-sm text-gray-600 mb-1">
-                          <Clock className="h-4 w-4" />
-                          <span>Duration</span>
+                        <div className={`flex items-center space-x-1 ${viewMode === 'row' ? 'text-xs' : 'text-sm'} text-gray-600 ${viewMode === 'row' ? 'mb-0.5' : 'mb-1'}`}>
+                          <Clock className={`${viewMode === 'row' ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                          <span>{viewMode === 'row' ? 'Time' : 'Duration'}</span>
                         </div>
-                        <p className={`font-medium ${
+                        <p className={`${viewMode === 'row' ? 'text-xs' : 'text-sm'} font-medium ${
                           option.isBestOption ? 'text-green-800' : 'text-gray-900'
                         }`}>
                           {option.duration}
                         </p>
                       </div>
                       <div>
-                        <div className="flex items-center space-x-1 text-sm text-gray-600 mb-1">
-                          <IndianRupee className="h-4 w-4" />
+                        <div className={`flex items-center space-x-1 ${viewMode === 'row' ? 'text-xs' : 'text-sm'} text-gray-600 ${viewMode === 'row' ? 'mb-0.5' : 'mb-1'}`}>
+                          <IndianRupee className={`${viewMode === 'row' ? 'h-3 w-3' : 'h-4 w-4'}`} />
                           <span>Cost</span>
                         </div>
-                        <p className={`font-medium ${
+                        <p className={`${viewMode === 'row' ? 'text-xs' : 'text-sm'} font-medium ${
                           option.isBestOption ? 'text-green-800' : 'text-gray-900'
                         }`}>
                           {option.cost}
@@ -922,6 +930,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                       </div>
                     </div>
 
+                    {/* Pros and Cons - Only show in tile view or on larger screens for list view */}
                     {viewMode === 'tile' && (
                       <div className="space-y-3">
                         <div>
@@ -955,6 +964,29 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                       </div>
                     )}
 
+                    {/* Compact pros/cons for list view on larger screens */}
+                    {viewMode === 'row' && (
+                      <div className="hidden lg:block">
+                        <div className="flex space-x-4 text-xs">
+                          <div className="flex-1">
+                            <span className={`font-medium ${option.isBestOption ? 'text-green-700' : 'text-green-600'}`}>
+                              Pros: 
+                            </span>
+                            <span className="text-gray-600 ml-1">
+                              {option.pros.slice(0, 2).join(', ')}
+                              {option.pros.length > 2 && '...'}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <span className="font-medium text-red-600">Cons: </span>
+                            <span className="text-gray-600 ml-1">
+                              {option.cons.slice(0, 2).join(', ')}
+                              {option.cons.length > 2 && '...'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
