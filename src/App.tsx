@@ -115,7 +115,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
+    <div className="h-screen bg-gradient-to-br from-orange-50 to-green-50 flex flex-col overflow-hidden">
       {/* Header */}
       <AppHeader
         userEmail={userEmail}
@@ -126,7 +126,7 @@ function App() {
         onLogout={handleLogout}
       />
 
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar Navigation */}
         <AppSidebar
           activeTab={activeTab}
@@ -147,7 +147,7 @@ function App() {
         )}
 
         {/* Main Content */}
-        <main className={`flex-1 transition-all duration-300 ease-in-out ${
+        <main className={`flex-1 transition-all duration-300 ease-in-out overflow-y-auto ${
           sidebarCollapsed ? 'lg:ml-0' : 'lg:ml-0'
         }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -170,11 +170,11 @@ function App() {
               <VoiceNotes onSearchComplete={addSearchRecord} />
             )}
           </div>
+          
+          {/* Booking Links Footer */}
+          <BookingLinks />
         </main>
       </div>
-
-      {/* Booking Links Footer */}
-      <BookingLinks />
     </div>
   );
 }

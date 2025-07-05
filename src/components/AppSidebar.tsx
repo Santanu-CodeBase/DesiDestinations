@@ -35,10 +35,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
   };
 
   return (
-    <nav className={`fixed lg:relative inset-y-0 left-0 z-20 bg-gradient-to-b from-blue-900 to-blue-800 border-r border-blue-700 shadow-lg lg:shadow-none transition-all duration-300 ease-in-out ${
+    <nav className={`fixed lg:relative top-0 bottom-0 left-0 z-20 bg-gradient-to-b from-blue-900 to-blue-800 border-r border-blue-700 shadow-lg lg:shadow-none transition-all duration-300 ease-in-out flex-shrink-0 ${
       sidebarCollapsed ? 'w-16 lg:w-16' : 'w-64 lg:w-64'
     } ${sidebarCollapsed ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'}`}>
-      <div className="flex flex-col h-full pt-16 lg:pt-0">
+      <div className="flex flex-col h-full lg:pt-0">
         {/* Sidebar Header */}
         <div className={`flex items-center justify-between p-4 border-b border-blue-700 ${sidebarCollapsed ? 'lg:justify-center' : ''}`}>
           {!sidebarCollapsed && (
