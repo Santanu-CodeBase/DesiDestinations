@@ -173,14 +173,14 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
             {/* Destination */}
             <div>
-              <div className="flex items-end justify-between mb-2 h-6">
+              <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Destination
                 </label>
                 <button
                   onClick={swapDestinations}
                   disabled={!fromDestination || !toDestination}
-                  className="flex items-center space-x-1 px-3 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                  className="flex items-center space-x-1 px-3 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                   title="Swap destinations"
                 >
                   <span className="font-medium">Swap</span>
