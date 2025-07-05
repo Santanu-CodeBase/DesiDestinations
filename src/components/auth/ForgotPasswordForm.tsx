@@ -216,12 +216,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
           </div>
           <h3 className="text-lg font-semibold text-green-700">Reset Link Generated!</h3>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Click the button below to reset your password.
+            Your 1-minute reset link is ready. Click the button below to reset your password.
           </p>
           
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <p className="text-sm text-green-800 mb-3 font-medium">
-              🔗 Password Reset Link (Active for 15 minutes)
+              🔗 Password Reset Link (Active for 1 minute)
             </p>
             <button
               onClick={onUseResetLink}
@@ -250,7 +250,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
               Reset Password
             </h2>
             <p className="text-gray-600 text-sm">
-              Enter your email for a 15-minute reset link
+              Enter your email for a 1-minute reset link
             </p>
           </div>
           

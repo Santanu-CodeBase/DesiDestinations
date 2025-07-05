@@ -323,7 +323,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     const token = `reset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+    const expiry = new Date(Date.now() + 1 * 60 * 1000); // 1 minute from now
     
     // Store reset token with expiry
     localStorage.setItem(`reset_token_${cleanEmail}`, JSON.stringify({
