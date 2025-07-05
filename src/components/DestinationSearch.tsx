@@ -173,7 +173,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
             {/* Destination */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-end justify-between mb-2 h-6">
                 <label className="block text-sm font-medium text-gray-700">
                   Destination
                 </label>
