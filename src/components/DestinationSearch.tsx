@@ -469,7 +469,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+      <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-gray-700/50">
         <h2 className="text-2xl font-bold text-gray-100 mb-6 flex items-center">
           <Search className="h-6 w-6 text-orange-400 mr-2" />
           What's in your mind today?
