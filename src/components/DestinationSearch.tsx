@@ -112,12 +112,12 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
         {/* Destination Selection */}
         <div className="space-y-6">
-          {/* From and To Destinations */}
+          {/* Source and Destination */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* From Destination */}
+            {/* Source */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                From
+                Source
               </label>
               <div className="relative">
                 {fromDestination ? (
@@ -144,7 +144,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                       }}
                       onFocus={() => setShowFromSuggestions(true)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                      placeholder="Search starting location..."
+                      placeholder="Search source location..."
                     />
                     
                     {showFromSuggestions && fromSearchTerm && (
@@ -171,7 +171,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
               </div>
             </div>
 
-            {/* Swap Button */}
+            {/* Swap Button for Mobile */}
             <div className="lg:hidden flex justify-center">
               <button
                 onClick={swapDestinations}
@@ -183,10 +183,10 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
               </button>
             </div>
 
-            {/* To Destination */}
+            {/* Destination */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                To
+                Destination
               </label>
               <div className="relative">
                 {toDestination ? (
@@ -331,11 +331,11 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         </h3>
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for From:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for Source:</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {popularDestinations.map(dest => (
                 <button
-                  key={`from-${dest}`}
+                  key={`source-${dest}`}
                   onClick={() => handleFromDestinationSelect(dest)}
                   className={`p-2 text-center rounded-lg transition-colors border text-sm ${
                     fromDestination === dest
@@ -350,11 +350,11 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           </div>
           
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for To:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for Destination:</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {popularDestinations.map(dest => (
                 <button
-                  key={`to-${dest}`}
+                  key={`destination-${dest}`}
                   onClick={() => handleToDestinationSelect(dest)}
                   className={`p-2 text-center rounded-lg transition-colors border text-sm ${
                     toDestination === dest
