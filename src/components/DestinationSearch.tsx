@@ -117,7 +117,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
             {/* From Destination */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                From Destination
+                From
               </label>
               <div className="relative">
                 {fromDestination ? (
