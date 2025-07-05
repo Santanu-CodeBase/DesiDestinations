@@ -469,9 +469,9 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-gray-700/50">
-        <h2 className="text-2xl font-bold text-gray-100 mb-6 flex items-center">
-          <Search className="h-6 w-6 text-orange-400 mr-2" />
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+          <Search className="h-6 w-6 text-orange-600 mr-2" />
           What's in your mind today?
         </h2>
 
@@ -482,7 +482,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
             {/* Source */}
             <div>
               <div className="flex items-center justify-between mb-2 h-8">
-                <label className="block text-sm font-medium text-gray-300">
+                <label className="block text-sm font-medium text-gray-700">
                   Source
                 </label>
                 <div className="w-16"></div> {/* Spacer to match destination layout */}
@@ -511,23 +511,23 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                         setShowFromSuggestions(true);
                       }}
                       onFocus={() => setShowFromSuggestions(true)}
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none text-gray-100 placeholder-gray-400"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
                       placeholder="Search source location..."
                     />
                     
                     {showFromSuggestions && fromSearchTerm && (
-                      <div className="absolute z-10 w-full mt-1 bg-gray-800/95 backdrop-blur-md border border-gray-600 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                         {getFilteredDestinations(fromSearchTerm).map(dest => (
                           <button
                             key={dest.name}
                             onClick={() => handleFromDestinationSelect(dest.name)}
-                            className="w-full px-4 py-2 text-left hover:bg-orange-500/20 flex items-center justify-between text-gray-200 hover:text-orange-300 transition-colors"
+                            className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
                           >
                             <div>
-                              <span className="font-medium text-gray-100">{dest.name}</span>
-                              <span className="text-sm text-gray-400 ml-2">({dest.state})</span>
+                              <span className="font-medium">{dest.name}</span>
+                              <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
                             </div>
-                            <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded border border-orange-500/30">
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
                               {dest.type}
                             </span>
                           </button>
@@ -542,7 +542,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
             {/* Destination */}
             <div>
               <div className="flex items-center justify-between mb-2 h-8">
-                <label className="block text-sm font-medium text-gray-300">
+                <label className="block text-sm font-medium text-gray-700">
                   Destination
                 </label>
                 <button
@@ -578,23 +578,23 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                         setShowToSuggestions(true);
                       }}
                       onFocus={() => setShowToSuggestions(true)}
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none text-gray-100 placeholder-gray-400"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
                       placeholder="Search destination..."
                     />
                     
                     {showToSuggestions && toSearchTerm && (
-                      <div className="absolute z-10 w-full mt-1 bg-gray-800/95 backdrop-blur-md border border-gray-600 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                         {getFilteredDestinations(toSearchTerm).map(dest => (
                           <button
                             key={dest.name}
                             onClick={() => handleToDestinationSelect(dest.name)}
-                            className="w-full px-4 py-2 text-left hover:bg-orange-500/20 flex items-center justify-between text-gray-200 hover:text-orange-300 transition-colors"
+                            className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
                           >
                             <div>
-                              <span className="font-medium text-gray-100">{dest.name}</span>
-                              <span className="text-sm text-gray-400 ml-2">({dest.state})</span>
+                              <span className="font-medium">{dest.name}</span>
+                              <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
                             </div>
-                            <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded border border-orange-500/30">
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
                               {dest.type}
                             </span>
                           </button>
@@ -627,7 +627,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           {/* Date Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Start Date
               </label>
               <input
@@ -636,11 +636,11 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                 onChange={(e) => setStartDate(e.target.value)}
                 min={formatDateForInput(today)}
                 max={formatDateForInput(maxDate)}
-                className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none text-gray-100"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 End Date
               </label>
               <input
@@ -649,7 +649,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                 onChange={(e) => setEndDate(e.target.value)}
                 min={startDate || formatDateForInput(today)}
                 max={formatDateForInput(maxDate)}
-                className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none text-gray-100"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
               />
             </div>
           </div>
@@ -658,7 +658,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           <button
             onClick={handleSearch}
             disabled={!fromDestination || !toDestination || !startDate || !endDate || isSearching}
-            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-amber-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg"
+            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             {isSearching ? (
               <>
@@ -676,9 +676,9 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
       </div>
 
       {/* Popular Destinations */}
-      <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-gray-700/50">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center">
-          <Star className="h-5 w-5 text-amber-400 mr-2" />
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <Star className="h-5 w-5 text-orange-600 mr-2" />
           {fromDestination && toDestination ? 'Travel Recommendations' : 'Popular Destinations'}
         </h3>
         
@@ -1074,7 +1074,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           // Popular Destinations Selection
           <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-300 mb-2">Quick select for Source:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for Source:</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {popularDestinations.map(dest => (
                 <button
@@ -1083,7 +1083,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                   className={`p-2 text-center rounded-lg transition-colors border text-sm ${
                     fromDestination === dest
                       ? 'bg-green-100 border-green-300 text-green-700'
-                      : 'bg-gradient-to-br from-orange-500/10 to-amber-500/10 hover:from-orange-500/20 hover:to-amber-500/20 border border-orange-500/30 hover:border-orange-400/50 backdrop-blur-sm text-orange-300'
+                      : 'bg-green-50 hover:bg-green-100 border-green-200 hover:border-green-300 text-green-600'
                   }`}
                 >
                   {dest}
@@ -1093,7 +1093,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           </div>
           
           <div>
-            <h4 className="text-sm font-medium text-gray-300 mb-2">Quick select for Destination:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for Destination:</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {popularDestinations.map(dest => (
                 <button
@@ -1102,7 +1102,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                   className={`p-2 text-center rounded-lg transition-colors border text-sm ${
                     toDestination === dest
                       ? 'bg-blue-100 border-blue-300 text-blue-700'
-                      : 'bg-gradient-to-br from-orange-500/10 to-amber-500/10 hover:from-orange-500/20 hover:to-amber-500/20 border border-orange-500/30 hover:border-orange-400/50 backdrop-blur-sm text-orange-300'
+                      : 'bg-blue-50 hover:bg-blue-100 border-blue-200 hover:border-blue-300 text-blue-600'
                   }`}
                 >
                   {dest}
