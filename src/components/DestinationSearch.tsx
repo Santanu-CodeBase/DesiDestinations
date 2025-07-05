@@ -878,6 +878,112 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
               </a>
             </div>
           </div>
+          {/* Embedded Booking Options */}
+          <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200">
+            <h4 className="font-medium text-blue-900 mb-3 flex items-center">
+              <ArrowRight className="h-4 w-4 mr-2" />
+              Book Your Journey Directly:
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="bg-white rounded-lg border border-blue-300 overflow-hidden hover:shadow-lg transition-all">
+                <div className="bg-blue-500 text-white p-2 text-center">
+                  <Train className="h-4 w-4 inline mr-1" />
+                  <span className="text-sm font-medium">Train Booking</span>
+                </div>
+                <iframe
+                  src="https://www.irctc.co.in"
+                  className="w-full h-32 border-0"
+                  title="IRCTC Train Booking"
+                  sandbox="allow-scripts allow-same-origin allow-forms"
+                />
+                <div className="p-2 text-center">
+                  <a
+                    href="https://www.irctc.co.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Open IRCTC →
+                  </a>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg border border-red-300 overflow-hidden hover:shadow-lg transition-all">
+                <div className="bg-red-500 text-white p-2 text-center">
+                  <Bus className="h-4 w-4 inline mr-1" />
+                  <span className="text-sm font-medium">Bus Booking</span>
+                </div>
+                <iframe
+                  src="https://www.redbus.in"
+                  className="w-full h-32 border-0"
+                  title="RedBus Bus Booking"
+                  sandbox="allow-scripts allow-same-origin allow-forms"
+                />
+                <div className="p-2 text-center">
+                  <a
+                    href="https://www.redbus.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-red-600 hover:text-red-800 font-medium"
+                  >
+                    Open RedBus →
+                  </a>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg border border-indigo-300 overflow-hidden hover:shadow-lg transition-all">
+                <div className="bg-indigo-500 text-white p-2 text-center">
+                  <Plane className="h-4 w-4 inline mr-1" />
+                  <span className="text-sm font-medium">Flight Booking</span>
+                </div>
+                <iframe
+                  src="https://www.goindigo.in"
+                  className="w-full h-32 border-0"
+                  title="IndiGo Flight Booking"
+                  sandbox="allow-scripts allow-same-origin allow-forms"
+                />
+                <div className="p-2 text-center">
+                  <a
+                    href="https://www.goindigo.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                  >
+                    Open IndiGo →
+                  </a>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg border border-green-300 overflow-hidden hover:shadow-lg transition-all">
+                <div className="bg-green-500 text-white p-2 text-center">
+                  <Car className="h-4 w-4 inline mr-1" />
+                  <span className="text-sm font-medium">Car Rental</span>
+                </div>
+                <iframe
+                  src="https://www.zoomcar.com"
+                  className="w-full h-32 border-0"
+                  title="Zoomcar Car Rental"
+                  sandbox="allow-scripts allow-same-origin allow-forms"
+                />
+                <div className="p-2 text-center">
+                  <a
+                    href="https://www.zoomcar.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-green-600 hover:text-green-800 font-medium"
+                  >
+                    Open Zoomcar →
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-3 p-2 bg-yellow-50 rounded border border-yellow-200">
+              <p className="text-xs text-yellow-800 text-center">
+                💡 <strong>Tip:</strong> Compare prices across platforms and book in advance for better deals!
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
