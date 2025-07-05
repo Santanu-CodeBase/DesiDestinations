@@ -34,7 +34,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   ).slice(0, 10);
 
   const handleDestinationSelect = (destination: string) => {
-    if (selectedDestinations.length < 5 && !selectedDestinations.includes(destination)) {
+    if (!selectedDestinations.includes(destination)) {
       setSelectedDestinations([...selectedDestinations, destination]);
     }
     setSearchTerm('');
@@ -89,7 +89,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Destinations (Max 5)
+              Select Destinations
             </label>
             <div className="relative">
               <input
@@ -204,17 +204,27 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           <Star className="h-5 w-5 text-orange-600 mr-2" />
           Popular Destinations
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {['Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Tamil Nadu', 'Karnataka', 'Uttarakhand', 'Maharashtra'].map(dest => (
             <button
               key={dest}
               onClick={() => handleDestinationSelect(dest)}
-              className="p-3 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200 hover:border-orange-300"
+              className={`p-3 text-center rounded-lg transition-colors border ${
+                selectedDestinations.includes(dest)
+                  ? 'bg-orange-100 border-orange-300 text-orange-700'
+                  : 'bg-orange-50 hover:bg-orange-100 border-orange-200 hover:border-orange-300'
+              }`}
+              disabled={selectedDestinations.includes(dest)}
             >
               <span className="text-sm font-medium text-orange-700">{dest}</span>
             </button>
           ))}
         </div>
+        {selectedDestinations.length > 0 && (
+          <div className="mt-4 text-sm text-gray-600">
+            <span className="font-medium">{selectedDestinations.length}</span> destination{selectedDestinations.length !== 1 ? 's' : ''} selected
+          </div>
+        )}
       </div>
     </div>
   );
