@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Plus, X, Star } from 'lucide-react';
+import { Search, Calendar, MapPin, Plus, X, Star, ArrowRight } from 'lucide-react';
 import Logo from './Logo';
 import { indianDestinations } from '../data/destinations';
 import { SearchRecord } from '../types';
@@ -9,11 +9,14 @@ interface DestinationSearchProps {
 }
 
 const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete }) => {
-  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [fromDestination, setFromDestination] = useState('');
+  const [toDestination, setToDestination] = useState('');
+  const [fromSearchTerm, setFromSearchTerm] = useState('');
+  const [toSearchTerm, setToSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showFromSuggestions, setShowFromSuggestions] = useState(false);
+  const [showToSuggestions, setShowToSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
   const today = new Date();
@@ -28,40 +31,59 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
   };
 
-  const filteredDestinations = indianDestinations.filter(dest =>
-    dest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dest.state.toLowerCase().includes(searchTerm.toLowerCase())
-  ).slice(0, 10);
-
-  const handleDestinationSelect = (destination: string) => {
-    if (!selectedDestinations.includes(destination)) {
-      setSelectedDestinations([...selectedDestinations, destination]);
-    }
-    setSearchTerm('');
-    setShowSuggestions(false);
+  const getFilteredDestinations = (searchTerm: string) => {
+    return indianDestinations.filter(dest =>
+      dest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dest.state.toLowerCase().includes(searchTerm.toLowerCase())
+    ).slice(0, 10);
   };
 
-  const handleRemoveDestination = (destination: string) => {
-    setSelectedDestinations(selectedDestinations.filter(d => d !== destination));
+  const handleFromDestinationSelect = (destination: string) => {
+    setFromDestination(destination);
+    setFromSearchTerm('');
+    setShowFromSuggestions(false);
+  };
+
+  const handleToDestinationSelect = (destination: string) => {
+    setToDestination(destination);
+    setToSearchTerm('');
+    setShowToSuggestions(false);
+  };
+
+  const clearFromDestination = () => {
+    setFromDestination('');
+    setFromSearchTerm('');
+  };
+
+  const clearToDestination = () => {
+    setToDestination('');
+    setToSearchTerm('');
+  };
+
+  const swapDestinations = () => {
+    const tempFrom = fromDestination;
+    const tempTo = toDestination;
+    setFromDestination(tempTo);
+    setToDestination(tempFrom);
   };
 
   const handleSearch = async () => {
-    if (selectedDestinations.length === 0 || !startDate || !endDate) return;
+    if (!fromDestination || !toDestination || !startDate || !endDate) return;
 
     setIsSearching(true);
     
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Generate mock activities for each destination
+    // Generate mock activities for both destinations
     const activities: { [key: string]: string[] } = {};
-    selectedDestinations.forEach(dest => {
+    [fromDestination, toDestination].forEach(dest => {
       const destData = indianDestinations.find(d => d.name === dest);
       activities[dest] = destData ? destData.activities.slice(0, 3) : [];
     });
 
     const searchRecord: Omit<SearchRecord, 'id' | 'timestamp'> = {
-      destinations: selectedDestinations,
+      destinations: [fromDestination, toDestination],
       startDate: formatDateDDMMYYYY(startDate),
       endDate: formatDateDDMMYYYY(endDate),
       activities,
@@ -72,10 +94,13 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     setIsSearching(false);
     
     // Reset form
-    setSelectedDestinations([]);
+    setFromDestination('');
+    setToDestination('');
     setStartDate('');
     setEndDate('');
   };
+
+  const popularDestinations = ['Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Tamil Nadu', 'Karnataka', 'Uttarakhand', 'Maharashtra'];
 
   return (
     <div className="space-y-6">
@@ -86,64 +111,164 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         </h2>
 
         {/* Destination Selection */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Destinations
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setShowSuggestions(true);
-                }}
-                onFocus={() => setShowSuggestions(true)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                placeholder="Search states or cities..."
-              />
-              
-              {showSuggestions && searchTerm && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {filteredDestinations.map(dest => (
+        <div className="space-y-6">
+          {/* From and To Destinations */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* From Destination */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                From Destination
+              </label>
+              <div className="relative">
+                {fromDestination ? (
+                  <div className="flex items-center justify-between p-3 border border-gray-300 rounded-lg bg-green-50 border-green-300">
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="h-4 w-4 text-green-600" />
+                      <span className="font-medium text-green-700">{fromDestination}</span>
+                    </div>
                     <button
-                      key={dest.name}
-                      onClick={() => handleDestinationSelect(dest.name)}
-                      className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
+                      onClick={clearFromDestination}
+                      className="text-green-500 hover:text-green-700"
                     >
-                      <div>
-                        <span className="font-medium">{dest.name}</span>
-                        <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
-                      </div>
-                      <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
-                        {dest.type}
-                      </span>
+                      <X className="h-4 w-4" />
                     </button>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={fromSearchTerm}
+                      onChange={(e) => {
+                        setFromSearchTerm(e.target.value);
+                        setShowFromSuggestions(true);
+                      }}
+                      onFocus={() => setShowFromSuggestions(true)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                      placeholder="Search starting location..."
+                    />
+                    
+                    {showFromSuggestions && fromSearchTerm && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {getFilteredDestinations(fromSearchTerm).map(dest => (
+                          <button
+                            key={dest.name}
+                            onClick={() => handleFromDestinationSelect(dest.name)}
+                            className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
+                          >
+                            <div>
+                              <span className="font-medium">{dest.name}</span>
+                              <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
+                            </div>
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                              {dest.type}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Swap Button */}
+            <div className="lg:hidden flex justify-center">
+              <button
+                onClick={swapDestinations}
+                disabled={!fromDestination || !toDestination}
+                className="p-2 rounded-full bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Swap destinations"
+              >
+                <ArrowRight className="h-5 w-5 transform rotate-90" />
+              </button>
+            </div>
+
+            {/* To Destination */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                To Destination
+              </label>
+              <div className="relative">
+                {toDestination ? (
+                  <div className="flex items-center justify-between p-3 border border-gray-300 rounded-lg bg-blue-50 border-blue-300">
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-blue-700">{toDestination}</span>
+                    </div>
+                    <button
+                      onClick={clearToDestination}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={toSearchTerm}
+                      onChange={(e) => {
+                        setToSearchTerm(e.target.value);
+                        setShowToSuggestions(true);
+                      }}
+                      onFocus={() => setShowToSuggestions(true)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                      placeholder="Search destination..."
+                    />
+                    
+                    {showToSuggestions && toSearchTerm && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {getFilteredDestinations(toSearchTerm).map(dest => (
+                          <button
+                            key={dest.name}
+                            onClick={() => handleToDestinationSelect(dest.name)}
+                            className="w-full px-4 py-2 text-left hover:bg-orange-50 flex items-center justify-between"
+                          >
+                            <div>
+                              <span className="font-medium">{dest.name}</span>
+                              <span className="text-sm text-gray-500 ml-2">({dest.state})</span>
+                            </div>
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                              {dest.type}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Selected Destinations */}
-          {selectedDestinations.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {selectedDestinations.map(dest => (
-                <div
-                  key={dest}
-                  className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full flex items-center space-x-2"
-                >
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm font-medium">{dest}</span>
-                  <button
-                    onClick={() => handleRemoveDestination(dest)}
-                    className="text-orange-500 hover:text-orange-700"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+          {/* Swap Button for Desktop */}
+          <div className="hidden lg:flex justify-center">
+            <button
+              onClick={swapDestinations}
+              disabled={!fromDestination || !toDestination}
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Swap destinations"
+            >
+              <ArrowRight className="h-4 w-4" />
+              <span className="text-sm font-medium">Swap</span>
+              <ArrowRight className="h-4 w-4 transform rotate-180" />
+            </button>
+          </div>
+
+          {/* Journey Summary */}
+          {fromDestination && toDestination && (
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="font-medium text-green-700">{fromDestination}</span>
                 </div>
-              ))}
+                <ArrowRight className="h-5 w-5 text-gray-400" />
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="font-medium text-blue-700">{toDestination}</span>
+                </div>
+              </div>
             </div>
           )}
 
@@ -180,7 +305,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           {/* Search Button */}
           <button
             onClick={handleSearch}
-            disabled={selectedDestinations.length === 0 || !startDate || !endDate || isSearching}
+            disabled={!fromDestination || !toDestination || !startDate || !endDate || isSearching}
             className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             {isSearching ? (
@@ -191,7 +316,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
             ) : (
               <>
                 <Search className="h-5 w-5" />
-                <span>Search Destinations</span>
+                <span>Search Journey</span>
               </>
             )}
           </button>
@@ -204,27 +329,45 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           <Star className="h-5 w-5 text-orange-600 mr-2" />
           Popular Destinations
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {['Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Tamil Nadu', 'Karnataka', 'Uttarakhand', 'Maharashtra'].map(dest => (
-            <button
-              key={dest}
-              onClick={() => handleDestinationSelect(dest)}
-              className={`p-3 text-center rounded-lg transition-colors border ${
-                selectedDestinations.includes(dest)
-                  ? 'bg-orange-100 border-orange-300 text-orange-700'
-                  : 'bg-orange-50 hover:bg-orange-100 border-orange-200 hover:border-orange-300'
-              }`}
-              disabled={selectedDestinations.includes(dest)}
-            >
-              <span className="text-sm font-medium text-orange-700">{dest}</span>
-            </button>
-          ))}
-        </div>
-        {selectedDestinations.length > 0 && (
-          <div className="mt-4 text-sm text-gray-600">
-            <span className="font-medium">{selectedDestinations.length}</span> destination{selectedDestinations.length !== 1 ? 's' : ''} selected
+        <div className="space-y-4">
+          <div>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for From destination:</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              {popularDestinations.map(dest => (
+                <button
+                  key={`from-${dest}`}
+                  onClick={() => handleFromDestinationSelect(dest)}
+                  className={`p-2 text-center rounded-lg transition-colors border text-sm ${
+                    fromDestination === dest
+                      ? 'bg-green-100 border-green-300 text-green-700'
+                      : 'bg-green-50 hover:bg-green-100 border-green-200 hover:border-green-300 text-green-600'
+                  }`}
+                >
+                  {dest}
+                </button>
+              ))}
+            </div>
           </div>
-        )}
+          
+          <div>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for To destination:</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              {popularDestinations.map(dest => (
+                <button
+                  key={`to-${dest}`}
+                  onClick={() => handleToDestinationSelect(dest)}
+                  className={`p-2 text-center rounded-lg transition-colors border text-sm ${
+                    toDestination === dest
+                      ? 'bg-blue-100 border-blue-300 text-blue-700'
+                      : 'bg-blue-50 hover:bg-blue-100 border-blue-200 hover:border-blue-300 text-blue-600'
+                  }`}
+                >
+                  {dest}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
