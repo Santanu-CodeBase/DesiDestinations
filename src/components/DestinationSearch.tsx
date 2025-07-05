@@ -847,6 +847,56 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                       </div>
                     </div>
 
+                    {/* Smart Recommendation Panel - Integrated within each option */}
+                    <div className={`mb-4 p-3 rounded-lg border ${
+                      option.isBestOption 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-blue-50 border-blue-200'
+                    }`}>
+                      <div className="flex items-start space-x-2">
+                        <div className={`p-1.5 rounded-lg ${
+                          option.isBestOption ? 'bg-green-100' : 'bg-blue-100'
+                        }`}>
+                          <Lightbulb className={`h-4 w-4 ${
+                            option.isBestOption ? 'text-green-600' : 'text-blue-600'
+                          }`} />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className={`text-sm font-semibold mb-1 ${
+                            option.isBestOption ? 'text-green-800' : 'text-blue-800'
+                          }`}>
+                            {option.isBestOption ? 'Why This is Your Best Choice' : 'Smart Analysis'}
+                          </h5>
+                          <div className={`text-xs space-y-1 ${
+                            option.isBestOption ? 'text-green-700' : 'text-blue-700'
+                          }`}>
+                            <p>
+                              <strong>Route Analysis:</strong> {
+                                isLongDistanceRoute(fromDestination, toDestination) 
+                                  ? 'Long distance route - ' + (option.type === 'flight' ? 'flights are most efficient' : option.type === 'train' ? 'trains offer comfort for overnight travel' : option.type === 'bus' ? 'buses are budget-friendly but time-consuming' : 'driving requires multiple stops')
+                                  : isShortDistanceRoute(fromDestination, toDestination)
+                                    ? 'Short distance route - ' + (option.type === 'car' ? 'perfect for road trips with flexibility' : option.type === 'bus' ? 'convenient and economical' : option.type === 'train' ? 'comfortable city-to-city travel' : 'flights might be overkill for this distance')
+                                    : 'Medium distance route - ' + (option.type === 'train' ? 'ideal balance of comfort and time' : option.type === 'flight' ? 'good time savings' : option.type === 'bus' ? 'decent budget option' : 'flexible with scenic stops')
+                              }
+                            </p>
+                            <p>
+                              <strong>Score Breakdown:</strong> {
+                                option.score >= 90 ? 'Excellent choice - optimal for your route with best time-cost balance' :
+                                option.score >= 85 ? 'Great option - well-suited considering distance and comfort factors' :
+                                option.score >= 80 ? 'Good choice - reasonable trade-offs for your journey' :
+                                option.score >= 70 ? 'Decent option - consider if other factors are important' :
+                                'Alternative option - may have specific advantages for your needs'
+                              }
+                            </p>
+                            {option.isBestOption && (
+                              <p className="font-medium">
+                                ⭐ <strong>Recommended:</strong> This option provides the best overall experience for your {fromDestination} to {toDestination} journey.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
                         <div className="flex items-center space-x-1 text-sm text-gray-600 mb-1">
@@ -905,46 +955,26 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                       </div>
                     )}
 
-                    {/* Best Option Call-to-Action */}
-                    {option.isBestOption && (
-                      <div className="mt-4 pt-3 border-t border-green-200">
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs text-green-700">
-                            <span className="font-medium">Why this is recommended:</span>
-                            <p className="mt-1">
-                              {option.score >= 90 ? 'Optimal for your route with best time-cost balance' :
-                               option.score >= 85 ? 'Great choice considering distance and comfort' :
-                               'Good option with reasonable trade-offs'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
 
-            {/* Recommendation Summary */}
+            {/* Quick Summary */}
             {travelRecommendations.length > 0 && (
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Lightbulb className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-blue-900 mb-2">Smart Recommendation</h4>
-                    <p className="text-sm text-blue-800 mb-2">
-                      Based on your route from <span className="font-medium">{fromDestination}</span> to <span className="font-medium">{toDestination}</span>, 
-                      we've analyzed factors like distance, cost, comfort, and convenience to recommend the best travel option.
-                    </p>
-                    <div className="text-xs text-blue-700 space-y-1">
-                      <p>• <strong>Distance:</strong> {isLongDistanceRoute(fromDestination, toDestination) ? 'Long distance' : isShortDistanceRoute(fromDestination, toDestination) ? 'Short distance' : 'Medium distance'}</p>
-                      <p>• <strong>Recommendation:</strong> Look for the ⭐ RECOMMENDED option for the best overall experience</p>
-                      <p>• <strong>Score:</strong> Higher scores indicate better suitability for your specific journey</p>
-                    </div>
-                  </div>
+              <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Info className="h-4 w-4 text-amber-600" />
+                  <h4 className="font-semibold text-amber-900">Journey Summary</h4>
                 </div>
+                <p className="text-sm text-amber-800">
+                  Route: <span className="font-medium">{fromDestination}</span> → <span className="font-medium">{toDestination}</span> • 
+                  Distance: <span className="font-medium">{
+                    isLongDistanceRoute(fromDestination, toDestination) ? 'Long distance' : 
+                    isShortDistanceRoute(fromDestination, toDestination) ? 'Short distance' : 'Medium distance'
+                  }</span> • 
+                  Each option includes smart analysis to help you decide
+                </p>
               </div>
             )}
           </div>
