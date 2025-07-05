@@ -1,6 +1,3 @@
-Here's the fixed version with all missing closing brackets added:
-
-```typescript
 import React, { useState } from 'react';
 import { Search, Calendar, MapPin, Plus, X, Star, Train, Plane, Bus, Car, Lightbulb, Info, Waves, ArrowRight, Building, TreePine, Utensils, Mountain, Camera, Clock, Route, IndianRupee } from 'lucide-react';
 import Logo from './Logo';
@@ -681,4 +678,228 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
       {/* Popular Destinations */}
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Star className="h-5 w-5 text-orange-600 mr-2
+          <Star className="h-5 w-5 text-orange-600 mr-2" />
+          Popular Destinations
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {popularDestinations.map(destination => (
+            <button
+              key={destination}
+              onClick={() => {
+                if (!fromDestination) {
+                  handleFromDestinationSelect(destination);
+                } else if (!toDestination) {
+                  handleToDestinationSelect(destination);
+                }
+              }}
+              className="p-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors border border-gray-200 hover:border-orange-200"
+            >
+              {destination}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Travel Recommendations */}
+      {travelRecommendations.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Route className="h-5 w-5 text-orange-600 mr-2" />
+              Travel Options
+            </h3>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setViewMode('row')}
+                className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                  viewMode === 'row' 
+                    ? 'bg-orange-100 text-orange-600' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                List
+              </button>
+              <button
+                onClick={() => setViewMode('tile')}
+                className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                  viewMode === 'tile' 
+                    ? 'bg-orange-100 text-orange-600' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Grid
+              </button>
+            </div>
+          </div>
+
+          <div className={viewMode === 'tile' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
+            {travelRecommendations.map((option, index) => {
+              const IconComponent = option.icon;
+              const colorClasses = {
+                blue: 'border-blue-200 bg-blue-50 text-blue-600',
+                green: 'border-green-200 bg-green-50 text-green-600',
+                orange: 'border-orange-200 bg-orange-50 text-orange-600',
+                purple: 'border-purple-200 bg-purple-50 text-purple-600'
+              };
+
+              return (
+                <div
+                  key={index}
+                  className={`border rounded-lg p-4 hover:shadow-md transition-shadow ${
+                    viewMode === 'tile' ? 'h-full' : ''
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-lg ${colorClasses[option.color as keyof typeof colorClasses]}`}>
+                        <IconComponent className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{option.name}</h4>
+                        <p className="text-sm text-gray-600">{option.recommendation}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <div className="flex items-center space-x-1 text-sm text-gray-600 mb-1">
+                        <Clock className="h-4 w-4" />
+                        <span>Duration</span>
+                      </div>
+                      <p className="font-medium text-gray-900">{option.duration}</p>
+                    </div>
+                    <div>
+                      <div className="flex items-center space-x-1 text-sm text-gray-600 mb-1">
+                        <IndianRupee className="h-4 w-4" />
+                        <span>Cost</span>
+                      </div>
+                      <p className="font-medium text-gray-900">{option.cost}</p>
+                    </div>
+                  </div>
+
+                  {viewMode === 'tile' && (
+                    <div className="space-y-3">
+                      <div>
+                        <h5 className="text-sm font-medium text-green-700 mb-1">Pros</h5>
+                        <ul className="text-xs text-gray-600 space-y-1">
+                          {option.pros.map((pro: string, i: number) => (
+                            <li key={i} className="flex items-center space-x-1">
+                              <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+                              <span>{pro}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-medium text-red-700 mb-1">Cons</h5>
+                        <ul className="text-xs text-gray-600 space-y-1">
+                          {option.cons.map((con: string, i: number) => (
+                            <li key={i} className="flex items-center space-x-1">
+                              <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+                              <span>{con}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Destination Activities */}
+      {Object.keys(destinationActivities).length > 0 && (
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+            <Camera className="h-5 w-5 text-orange-600 mr-2" />
+            Things to Do
+          </h3>
+
+          {Object.entries(destinationActivities).map(([destination, data]: [string, any]) => (
+            <div key={destination} className="mb-8 last:mb-0">
+              <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center">
+                <MapPin className="h-4 w-4 text-orange-600 mr-2" />
+                {destination}
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {data.activities.map((activity: any, index: number) => {
+                  const IconComponent = activity.icon;
+                  return (
+                    <div key={index} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="aspect-video bg-gray-200 relative overflow-hidden">
+                        <img
+                          src={activity.image}
+                          alt={activity.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://images.pexels.com/photos/1583339/pexels-photo-1583339.jpeg?auto=compress&cs=tinysrgb&w=800';
+                          }}
+                        />
+                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-lg">
+                          <IconComponent className="h-4 w-4 text-orange-600" />
+                        </div>
+                      </div>
+                      
+                      <div className="p-4">
+                        <h5 className="font-semibold text-gray-900 mb-2">{activity.name}</h5>
+                        <p className="text-sm text-gray-600 mb-3">{activity.description}</p>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs text-gray-500">
+                            <span className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{activity.duration}</span>
+                            </span>
+                            <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                              {activity.bestTime}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Tips Section */}
+      <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl shadow-lg p-6 border border-orange-100">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <Lightbulb className="h-5 w-5 text-orange-600 mr-2" />
+          Travel Tips
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-start space-x-3">
+            <div className="bg-orange-100 p-2 rounded-lg">
+              <Info className="h-4 w-4 text-orange-600" />
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-900 mb-1">Best Time to Book</h4>
+              <p className="text-sm text-gray-600">Book flights 2-3 weeks in advance and trains 1-2 months early for better prices.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="bg-orange-100 p-2 rounded-lg">
+              <Calendar className="h-4 w-4 text-orange-600" />
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-900 mb-1">Travel Seasons</h4>
+              <p className="text-sm text-gray-600">October to March is ideal for most destinations. Check local weather patterns.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DestinationSearch;
