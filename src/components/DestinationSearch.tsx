@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Plus, X, Star, ArrowRight, Plane, Train, Bus, Car, Clock, IndianRupee, Route } from 'lucide-react';
+import { Search, Calendar, MapPin, Plus, X, Star, ArrowRight, Plane, Train, Bus, Car, Clock, IndianRupee, Route, Grid, List } from 'lucide-react';
 import Logo from './Logo';
 import { indianDestinations } from '../data/destinations';
 import { SearchRecord } from '../types';
@@ -19,6 +19,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const [showToSuggestions, setShowToSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [travelRecommendations, setTravelRecommendations] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<'row' | 'tile'>('row');
 
   const today = new Date();
   const maxDate = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000);
@@ -447,27 +448,58 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         {fromDestination && toDestination ? (
           // Travel Recommendations
           <div className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center justify-center space-x-4 mb-3">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="font-semibold text-green-700">{fromDestination}</span>
+            {/* View Toggle */}
+            <div className="flex items-center justify-between">
+              <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4 flex-1 mr-4">
+                <div className="flex items-center justify-center space-x-4 mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="font-semibold text-green-700">{fromDestination}</span>
+                  </div>
+                  <Route className="h-5 w-5 text-gray-400" />
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="font-semibold text-blue-700">{toDestination}</span>
+                  </div>
                 </div>
-                <Route className="h-5 w-5 text-gray-400" />
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span className="font-semibold text-blue-700">{toDestination}</span>
-                </div>
+                <p className="text-center text-sm text-gray-600">
+                  Choose your preferred mode of transport
+                </p>
               </div>
-              <p className="text-center text-sm text-gray-600">
-                Choose your preferred mode of transport
-              </p>
+              
+              <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('row')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'row'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Row view"
+                >
+                  <List className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('tile')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'tile'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Tile view"
+                >
+                  <Grid className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Travel Options */}
+            <div className={viewMode === 'tile' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-3'}>
               {travelRecommendations.map((option, index) => {
                 const Icon = option.icon;
-                return (
+                
+                if (viewMode === 'tile') {
+                  return (
                   <div
                     key={option.type}
                     className={`border-2 rounded-xl p-4 transition-all hover:shadow-lg cursor-pointer ${
@@ -545,6 +577,124 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                             <li key={i}>• {con}</li>
                           ))}
                         </ul>
+                      </div>
+                    </div>
+                  </div>
+                  );
+                }
+                
+                // Row view
+                return (
+                  <div
+                    key={option.type}
+                    className={`border-2 rounded-lg p-4 transition-all hover:shadow-md cursor-pointer ${
+                      option.color === 'blue' ? 'border-blue-200 hover:border-blue-300 bg-blue-50' :
+                      option.color === 'green' ? 'border-green-200 hover:border-green-300 bg-green-50' :
+                      option.color === 'orange' ? 'border-orange-200 hover:border-orange-300 bg-orange-50' :
+                      'border-purple-200 hover:border-purple-300 bg-purple-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      {/* Left section - Transport info */}
+                      <div className="flex items-center space-x-4">
+                        <div className={`p-3 rounded-lg ${
+                          option.color === 'blue' ? 'bg-blue-100' :
+                          option.color === 'green' ? 'bg-green-100' :
+                          option.color === 'orange' ? 'bg-orange-100' :
+                          'bg-purple-100'
+                        }`}>
+                          <Icon className={`h-6 w-6 ${
+                            option.color === 'blue' ? 'text-blue-600' :
+                            option.color === 'green' ? 'text-green-600' :
+                            option.color === 'orange' ? 'text-orange-600' :
+                            'text-purple-600'
+                          }`} />
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <h4 className="font-semibold text-gray-900 text-lg">{option.name}</h4>
+                            {index === 1 && (
+                              <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
+                                Recommended
+                              </span>
+                            )}
+                          </div>
+                          <p className={`text-sm font-medium ${
+                            option.color === 'blue' ? 'text-blue-600' :
+                            option.color === 'green' ? 'text-green-600' :
+                            option.color === 'orange' ? 'text-orange-600' :
+                            'text-purple-600'
+                          }`}>
+                            {option.recommendation}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Middle section - Key metrics */}
+                      <div className="hidden md:flex items-center space-x-8">
+                        <div className="text-center">
+                          <div className="flex items-center justify-center space-x-1 mb-1">
+                            <Clock className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm font-medium text-gray-900">{option.duration}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">Duration</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex items-center justify-center space-x-1 mb-1">
+                            <IndianRupee className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm font-medium text-gray-900">{option.cost}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">Cost Range</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex items-center justify-center space-x-1 mb-1">
+                            <Star className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm font-medium text-gray-900">{option.comfort}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">Comfort</p>
+                        </div>
+                      </div>
+
+                      {/* Right section - Pros/Cons summary */}
+                      <div className="hidden lg:block text-right max-w-xs">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-end space-x-2">
+                            <span className="text-xs font-medium text-green-700">Pros:</span>
+                            <span className="text-xs text-green-600">{option.pros[0]}</span>
+                          </div>
+                          <div className="flex items-center justify-end space-x-2">
+                            <span className="text-xs font-medium text-red-700">Cons:</span>
+                            <span className="text-xs text-red-600">{option.cons[0]}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Mobile metrics */}
+                      <div className="md:hidden text-right">
+                        <div className="text-sm font-medium text-gray-900">{option.duration}</div>
+                        <div className="text-sm text-gray-600">{option.cost}</div>
+                      </div>
+                    </div>
+
+                    {/* Mobile expanded details */}
+                    <div className="md:hidden mt-3 pt-3 border-t border-gray-200">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-xs font-medium text-green-700 mb-1">Pros:</p>
+                          <ul className="text-xs text-green-600 space-y-0.5">
+                            {option.pros.slice(0, 2).map((pro: string, i: number) => (
+                              <li key={i}>• {pro}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-red-700 mb-1">Cons:</p>
+                          <ul className="text-xs text-red-600 space-y-0.5">
+                            {option.cons.slice(0, 2).map((con: string, i: number) => (
+                              <li key={i}>• {con}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
