@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, MapPin, Calendar, Plane, Train, Bus, Car, Clock, IndianRupee, Star, ArrowRight, Camera, MapPin as ActivityIcon } from 'lucide-react';
+import { Search, MapPin, Calendar, Plane, Train, Bus, Car, Clock, IndianRupee, Star, ArrowRight, Camera, MapPin as ActivityIcon, ChevronDown } from 'lucide-react';
 import { SearchRecord } from '../types';
 
 interface DestinationSearchProps {
@@ -24,6 +24,10 @@ interface DestinationActivity {
 const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete }) => {
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
+  const [sourceQuery, setSourceQuery] = useState('');
+  const [destinationQuery, setDestinationQuery] = useState('');
+  const [showSourceSuggestions, setShowSourceSuggestions] = useState(false);
+  const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -35,11 +39,206 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const today = new Date().toISOString().split('T')[0];
   const maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  // Popular Indian destinations
+  // Comprehensive Indian states and major cities
+  const indianDestinations = [
+    // States
+    { name: 'Andhra Pradesh', type: 'state', region: 'South' },
+    { name: 'Arunachal Pradesh', type: 'state', region: 'Northeast' },
+    { name: 'Assam', type: 'state', region: 'Northeast' },
+    { name: 'Bihar', type: 'state', region: 'East' },
+    { name: 'Chhattisgarh', type: 'state', region: 'Central' },
+    { name: 'Goa', type: 'state', region: 'West' },
+    { name: 'Gujarat', type: 'state', region: 'West' },
+    { name: 'Haryana', type: 'state', region: 'North' },
+    { name: 'Himachal Pradesh', type: 'state', region: 'North' },
+    { name: 'Jharkhand', type: 'state', region: 'East' },
+    { name: 'Karnataka', type: 'state', region: 'South' },
+    { name: 'Kerala', type: 'state', region: 'South' },
+    { name: 'Madhya Pradesh', type: 'state', region: 'Central' },
+    { name: 'Maharashtra', type: 'state', region: 'West' },
+    { name: 'Manipur', type: 'state', region: 'Northeast' },
+    { name: 'Meghalaya', type: 'state', region: 'Northeast' },
+    { name: 'Mizoram', type: 'state', region: 'Northeast' },
+    { name: 'Nagaland', type: 'state', region: 'Northeast' },
+    { name: 'Odisha', type: 'state', region: 'East' },
+    { name: 'Punjab', type: 'state', region: 'North' },
+    { name: 'Rajasthan', type: 'state', region: 'North' },
+    { name: 'Sikkim', type: 'state', region: 'Northeast' },
+    { name: 'Tamil Nadu', type: 'state', region: 'South' },
+    { name: 'Telangana', type: 'state', region: 'South' },
+    { name: 'Tripura', type: 'state', region: 'Northeast' },
+    { name: 'Uttar Pradesh', type: 'state', region: 'North' },
+    { name: 'Uttarakhand', type: 'state', region: 'North' },
+    { name: 'West Bengal', type: 'state', region: 'East' },
+    
+    // Union Territories
+    { name: 'Andaman and Nicobar Islands', type: 'UT', region: 'South' },
+    { name: 'Chandigarh', type: 'UT', region: 'North' },
+    { name: 'Dadra and Nagar Haveli and Daman and Diu', type: 'UT', region: 'West' },
+    { name: 'Delhi', type: 'UT', region: 'North' },
+    { name: 'Jammu and Kashmir', type: 'UT', region: 'North' },
+    { name: 'Ladakh', type: 'UT', region: 'North' },
+    { name: 'Lakshadweep', type: 'UT', region: 'South' },
+    { name: 'Puducherry', type: 'UT', region: 'South' },
+    
+    // Major Cities
+    { name: 'Mumbai', type: 'city', region: 'West' },
+    { name: 'Bangalore', type: 'city', region: 'South' },
+    { name: 'Chennai', type: 'city', region: 'South' },
+    { name: 'Kolkata', type: 'city', region: 'East' },
+    { name: 'Hyderabad', type: 'city', region: 'South' },
+    { name: 'Pune', type: 'city', region: 'West' },
+    { name: 'Ahmedabad', type: 'city', region: 'West' },
+    { name: 'Jaipur', type: 'city', region: 'North' },
+    { name: 'Surat', type: 'city', region: 'West' },
+    { name: 'Lucknow', type: 'city', region: 'North' },
+    { name: 'Kanpur', type: 'city', region: 'North' },
+    { name: 'Nagpur', type: 'city', region: 'Central' },
+    { name: 'Indore', type: 'city', region: 'Central' },
+    { name: 'Thane', type: 'city', region: 'West' },
+    { name: 'Bhopal', type: 'city', region: 'Central' },
+    { name: 'Visakhapatnam', type: 'city', region: 'South' },
+    { name: 'Pimpri-Chinchwad', type: 'city', region: 'West' },
+    { name: 'Patna', type: 'city', region: 'East' },
+    { name: 'Vadodara', type: 'city', region: 'West' },
+    { name: 'Ghaziabad', type: 'city', region: 'North' },
+    { name: 'Ludhiana', type: 'city', region: 'North' },
+    { name: 'Agra', type: 'city', region: 'North' },
+    { name: 'Nashik', type: 'city', region: 'West' },
+    { name: 'Faridabad', type: 'city', region: 'North' },
+    { name: 'Meerut', type: 'city', region: 'North' },
+    { name: 'Rajkot', type: 'city', region: 'West' },
+    { name: 'Kalyan-Dombivali', type: 'city', region: 'West' },
+    { name: 'Vasai-Virar', type: 'city', region: 'West' },
+    { name: 'Varanasi', type: 'city', region: 'North' },
+    { name: 'Srinagar', type: 'city', region: 'North' },
+    { name: 'Aurangabad', type: 'city', region: 'West' },
+    { name: 'Dhanbad', type: 'city', region: 'East' },
+    { name: 'Amritsar', type: 'city', region: 'North' },
+    { name: 'Navi Mumbai', type: 'city', region: 'West' },
+    { name: 'Allahabad', type: 'city', region: 'North' },
+    { name: 'Ranchi', type: 'city', region: 'East' },
+    { name: 'Howrah', type: 'city', region: 'East' },
+    { name: 'Coimbatore', type: 'city', region: 'South' },
+    { name: 'Jabalpur', type: 'city', region: 'Central' },
+    { name: 'Gwalior', type: 'city', region: 'Central' },
+    { name: 'Vijayawada', type: 'city', region: 'South' },
+    { name: 'Jodhpur', type: 'city', region: 'North' },
+    { name: 'Madurai', type: 'city', region: 'South' },
+    { name: 'Raipur', type: 'city', region: 'Central' },
+    { name: 'Kota', type: 'city', region: 'North' },
+    { name: 'Guwahati', type: 'city', region: 'Northeast' },
+    { name: 'Chandigarh', type: 'city', region: 'North' },
+    { name: 'Thiruvananthapuram', type: 'city', region: 'South' },
+    { name: 'Solapur', type: 'city', region: 'West' },
+    { name: 'Hubballi-Dharwad', type: 'city', region: 'South' },
+    { name: 'Tiruchirappalli', type: 'city', region: 'South' },
+    { name: 'Bareilly', type: 'city', region: 'North' },
+    { name: 'Mysore', type: 'city', region: 'South' },
+    { name: 'Tiruppur', type: 'city', region: 'South' },
+    { name: 'Gurgaon', type: 'city', region: 'North' },
+    { name: 'Aligarh', type: 'city', region: 'North' },
+    { name: 'Jalandhar', type: 'city', region: 'North' },
+    { name: 'Bhubaneswar', type: 'city', region: 'East' },
+    { name: 'Salem', type: 'city', region: 'South' },
+    { name: 'Warangal', type: 'city', region: 'South' },
+    { name: 'Guntur', type: 'city', region: 'South' },
+    { name: 'Bhiwandi', type: 'city', region: 'West' },
+    { name: 'Saharanpur', type: 'city', region: 'North' },
+    { name: 'Gorakhpur', type: 'city', region: 'North' },
+    { name: 'Bikaner', type: 'city', region: 'North' },
+    { name: 'Amravati', type: 'city', region: 'West' },
+    { name: 'Noida', type: 'city', region: 'North' },
+    { name: 'Jamshedpur', type: 'city', region: 'East' },
+    { name: 'Bhilai', type: 'city', region: 'Central' },
+    { name: 'Cuttack', type: 'city', region: 'East' },
+    { name: 'Firozabad', type: 'city', region: 'North' },
+    { name: 'Kochi', type: 'city', region: 'South' },
+    { name: 'Nellore', type: 'city', region: 'South' },
+    { name: 'Bhavnagar', type: 'city', region: 'West' },
+    { name: 'Dehradun', type: 'city', region: 'North' },
+    { name: 'Durgapur', type: 'city', region: 'East' },
+    { name: 'Asansol', type: 'city', region: 'East' },
+    { name: 'Rourkela', type: 'city', region: 'East' },
+    { name: 'Nanded', type: 'city', region: 'West' },
+    { name: 'Kolhapur', type: 'city', region: 'West' },
+    { name: 'Ajmer', type: 'city', region: 'North' },
+    { name: 'Akola', type: 'city', region: 'West' },
+    { name: 'Gulbarga', type: 'city', region: 'South' },
+    { name: 'Jamnagar', type: 'city', region: 'West' },
+    { name: 'Ujjain', type: 'city', region: 'Central' },
+    { name: 'Loni', type: 'city', region: 'North' },
+    { name: 'Siliguri', type: 'city', region: 'East' },
+    { name: 'Jhansi', type: 'city', region: 'North' },
+    { name: 'Ulhasnagar', type: 'city', region: 'West' },
+    { name: 'Jammu', type: 'city', region: 'North' },
+    { name: 'Sangli-Miraj & Kupwad', type: 'city', region: 'West' },
+    { name: 'Mangalore', type: 'city', region: 'South' },
+    { name: 'Erode', type: 'city', region: 'South' },
+    { name: 'Belgaum', type: 'city', region: 'South' },
+    { name: 'Ambattur', type: 'city', region: 'South' },
+    { name: 'Tirunelveli', type: 'city', region: 'South' },
+    { name: 'Malegaon', type: 'city', region: 'West' },
+    { name: 'Gaya', type: 'city', region: 'East' },
+    { name: 'Jalgaon', type: 'city', region: 'West' },
+    { name: 'Udaipur', type: 'city', region: 'North' },
+    { name: 'Maheshtala', type: 'city', region: 'East' }
+  ];
+
+  // Popular destinations for quick access
   const popularDestinations = [
     'Delhi', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad',
     'Pune', 'Ahmedabad', 'Jaipur', 'Goa', 'Kerala', 'Rajasthan'
   ];
+
+  // Filter destinations based on search query
+  const getFilteredDestinations = (query: string) => {
+    if (!query.trim()) return [];
+    
+    const filtered = indianDestinations.filter(dest =>
+      dest.name.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    // Sort by relevance: exact matches first, then starts with, then contains
+    return filtered.sort((a, b) => {
+      const aLower = a.name.toLowerCase();
+      const bLower = b.name.toLowerCase();
+      const queryLower = query.toLowerCase();
+      
+      if (aLower === queryLower) return -1;
+      if (bLower === queryLower) return 1;
+      if (aLower.startsWith(queryLower) && !bLower.startsWith(queryLower)) return -1;
+      if (bLower.startsWith(queryLower) && !aLower.startsWith(queryLower)) return 1;
+      return aLower.localeCompare(bLower);
+    }).slice(0, 8); // Show max 8 suggestions
+  };
+
+  // Handle source input changes
+  const handleSourceChange = (value: string) => {
+    setSourceQuery(value);
+    setSource(value);
+    setShowSourceSuggestions(value.length > 0);
+  };
+
+  // Handle destination input changes
+  const handleDestinationChange = (value: string) => {
+    setDestinationQuery(value);
+    setDestination(value);
+    setShowDestinationSuggestions(value.length > 0);
+  };
+
+  // Handle suggestion selection
+  const handleSourceSuggestionSelect = (destination: any) => {
+    setSource(destination.name);
+    setSourceQuery(destination.name);
+    setShowSourceSuggestions(false);
+  };
+
+  const handleDestinationSuggestionSelect = (destination: any) => {
+    setDestination(destination.name);
+    setDestinationQuery(destination.name);
+    setShowDestinationSuggestions(false);
+  };
 
   // Get top activities for destination
   const getDestinationActivities = (destination: string): DestinationActivity[] => {
@@ -395,16 +594,22 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const handlePopularDestinationClick = (dest: string) => {
     if (!source) {
       setSource(dest);
+      setSourceQuery(dest);
     } else if (!destination && dest !== source) {
       setDestination(dest);
+      setDestinationQuery(dest);
     }
   };
 
   const clearForm = () => {
     setSource('');
     setDestination('');
+    setSourceQuery('');
+    setDestinationQuery('');
     setStartDate('');
     setEndDate('');
+    setShowSourceSuggestions(false);
+    setShowDestinationSuggestions(false);
     setShowResults(false);
     setSearchResults([]);
   };
@@ -436,28 +641,98 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                 <MapPin className="h-4 w-4 inline mr-1" />
                 Source
               </label>
-              <input
-                type="text"
-                value={source}
-                onChange={(e) => setSource(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                placeholder="Enter departure city"
-                disabled={isSearching}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={sourceQuery}
+                  onChange={(e) => handleSourceChange(e.target.value)}
+                  onFocus={() => setShowSourceSuggestions(sourceQuery.length > 0)}
+                  onBlur={() => setTimeout(() => setShowSourceSuggestions(false), 200)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                  placeholder="Enter departure city or state"
+                  disabled={isSearching}
+                />
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                
+                {/* Source Suggestions */}
+                {showSourceSuggestions && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {getFilteredDestinations(sourceQuery).map((dest, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSourceSuggestionSelect(dest)}
+                        className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center justify-between border-b border-gray-100 last:border-b-0"
+                      >
+                        <div>
+                          <span className="font-medium text-gray-900">{dest.name}</span>
+                          <span className="text-sm text-gray-500 ml-2">({dest.region})</span>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          dest.type === 'state' ? 'bg-blue-100 text-blue-700' :
+                          dest.type === 'UT' ? 'bg-green-100 text-green-700' :
+                          'bg-orange-100 text-orange-700'
+                        }`}>
+                          {dest.type === 'state' ? 'State' : dest.type === 'UT' ? 'UT' : 'City'}
+                        </span>
+                      </button>
+                    ))}
+                    {getFilteredDestinations(sourceQuery).length === 0 && sourceQuery.length > 0 && (
+                      <div className="px-4 py-3 text-gray-500 text-sm">
+                        No matches found. Try typing a different Indian state or city.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <MapPin className="h-4 w-4 inline mr-1" />
                 Destination
               </label>
-              <input
-                type="text"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                placeholder="Enter destination city"
-                disabled={isSearching}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={destinationQuery}
+                  onChange={(e) => handleDestinationChange(e.target.value)}
+                  onFocus={() => setShowDestinationSuggestions(destinationQuery.length > 0)}
+                  onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                  placeholder="Enter destination city or state"
+                  disabled={isSearching}
+                />
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                
+                {/* Destination Suggestions */}
+                {showDestinationSuggestions && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {getFilteredDestinations(destinationQuery).map((dest, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleDestinationSuggestionSelect(dest)}
+                        className="w-full px-4 py-3 text-left hover:bg-orange-50 flex items-center justify-between border-b border-gray-100 last:border-b-0"
+                      >
+                        <div>
+                          <span className="font-medium text-gray-900">{dest.name}</span>
+                          <span className="text-sm text-gray-500 ml-2">({dest.region})</span>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          dest.type === 'state' ? 'bg-blue-100 text-blue-700' :
+                          dest.type === 'UT' ? 'bg-green-100 text-green-700' :
+                          'bg-orange-100 text-orange-700'
+                        }`}>
+                          {dest.type === 'state' ? 'State' : dest.type === 'UT' ? 'UT' : 'City'}
+                        </span>
+                      </button>
+                    ))}
+                    {getFilteredDestinations(destinationQuery).length === 0 && destinationQuery.length > 0 && (
+                      <div className="px-4 py-3 text-gray-500 text-sm">
+                        No matches found. Try typing a different Indian state or city.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
