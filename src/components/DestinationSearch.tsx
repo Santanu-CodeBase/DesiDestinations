@@ -288,6 +288,8 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         comfort: 'High',
         recommendation: 'Fastest option',
         color: 'blue',
+        score: 0,
+        isBestOption: false,
         pros: ['Fastest travel', 'Comfortable', 'Weather independent'],
         cons: ['Most expensive', 'Airport transfers needed']
       },
@@ -300,6 +302,8 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         comfort: 'Medium-High',
         recommendation: 'Best value',
         color: 'green',
+        score: 0,
+        isBestOption: false,
         pros: ['Scenic journey', 'Multiple classes', 'City center to center'],
         cons: ['Longer duration', 'Booking required in advance']
       },
@@ -312,6 +316,8 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         comfort: 'Medium',
         recommendation: 'Budget friendly',
         color: 'orange',
+        score: 0,
+        isBestOption: false,
         pros: ['Most economical', 'Frequent services', 'Door to door'],
         cons: ['Traffic dependent', 'Less comfortable for long distances']
       },
@@ -324,38 +330,75 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         comfort: 'High',
         recommendation: 'Most flexible',
         color: 'purple',
+        score: 0,
+        isBestOption: false,
         pros: ['Complete flexibility', 'Scenic stops', 'Privacy'],
         cons: ['Driving fatigue', 'Fuel and tolls', 'Parking challenges']
       }
     ];
 
-    // Customize recommendations based on specific routes
+    // Customize recommendations and calculate scores based on specific routes
     const customizedOptions = travelOptions.map(option => {
       let customOption = { ...option };
+      let score = 0;
       
       // Adjust based on distance and route type
       if (isLongDistanceRoute(from, to)) {
         if (option.type === 'flight') {
           customOption.recommendation = 'Highly recommended for long distance';
           customOption.duration = '2-5 hours';
+          score = 90; // High score for long distance flights
         } else if (option.type === 'train') {
           customOption.recommendation = 'Comfortable overnight journey';
           customOption.duration = '12-24 hours';
+          score = 85; // Good score for long distance trains
+        } else if (option.type === 'bus') {
+          score = 60; // Lower score for long distance bus
+        } else if (option.type === 'car') {
+          score = 65; // Moderate score for long distance driving
         }
       } else if (isShortDistanceRoute(from, to)) {
         if (option.type === 'bus') {
           customOption.recommendation = 'Perfect for short trips';
           customOption.duration = '3-8 hours';
+          score = 85; // High score for short distance bus
         } else if (option.type === 'car') {
           customOption.recommendation = 'Ideal for weekend getaway';
           customOption.duration = '3-6 hours';
+          score = 90; // High score for short distance driving
+        } else if (option.type === 'train') {
+          score = 80; // Good score for short distance trains
+        } else if (option.type === 'flight') {
+          score = 70; // Lower score for short distance flights (overkill)
+        }
+      } else {
+        // Medium distance routes - balanced scoring
+        if (option.type === 'train') {
+          score = 85; // Trains are generally good for medium distances
+        } else if (option.type === 'flight') {
+          score = 80; // Flights are good but might be expensive
+        } else if (option.type === 'bus') {
+          score = 75; // Buses are decent for medium distances
+        } else if (option.type === 'car') {
+          score = 78; // Cars offer flexibility
         }
       }
 
+      customOption.score = score;
       return customOption;
     });
 
-    setTravelRecommendations(customizedOptions);
+    // Determine the best option based on score
+    const maxScore = Math.max(...customizedOptions.map(opt => opt.score));
+    const bestOptions = customizedOptions.map(opt => ({
+      ...opt,
+      isBestOption: opt.score === maxScore
+    }));
+
+    // Sort by score (best first)
+    bestOptions.sort((a, b) => b.score - a.score);
+
+    setTravelRecommendations(bestOptions);
     
     // Generate activities for both destinations
     const activities = {
@@ -747,19 +790,60 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                 return (
                   <div
                     key={index}
-                    className={`border rounded-lg p-4 hover:shadow-md transition-shadow ${
+                    className={`border rounded-lg p-4 hover:shadow-md transition-all duration-200 relative ${
                       viewMode === 'tile' ? 'h-full' : ''
+                    } ${
+                      option.isBestOption 
+                        ? 'border-2 border-green-400 bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg transform scale-[1.02]' 
+                        : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
+                    {/* Best Option Badge */}
+                    {option.isBestOption && (
+                      <div className="absolute -top-2 -right-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center space-x-1">
+                        <Star className="h-3 w-3 fill-current" />
+                        <span>RECOMMENDED</span>
+                      </div>
+                    )}
+
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg ${colorClasses[option.color as keyof typeof colorClasses]}`}>
+                        <div className={`p-2 rounded-lg ${
+                          option.isBestOption 
+                            ? 'bg-green-100 text-green-600 border border-green-200' 
+                            : colorClasses[option.color as keyof typeof colorClasses]
+                        }`}>
                           <IconComponent className="h-5 w-5" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900">{option.name}</h4>
-                          <p className="text-sm text-gray-600">{option.recommendation}</p>
+                          <h4 className={`font-semibold ${
+                            option.isBestOption ? 'text-green-800' : 'text-gray-900'
+                          }`}>
+                            {option.name}
+                            {option.isBestOption && (
+                              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                                Best Choice
+                              </span>
+                            )}
+                          </h4>
+                          <p className={`text-sm ${
+                            option.isBestOption ? 'text-green-700 font-medium' : 'text-gray-600'
+                          }`}>
+                            {option.recommendation}
+                          </p>
                         </div>
+                      </div>
+                      {/* Score indicator */}
+                      <div className={`text-xs font-bold px-2 py-1 rounded-full ${
+                        option.isBestOption 
+                          ? 'bg-green-200 text-green-800' 
+                          : option.score >= 80 
+                            ? 'bg-blue-100 text-blue-700'
+                            : option.score >= 70
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {option.score}/100
                       </div>
                     </div>
 
@@ -769,25 +853,39 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                           <Clock className="h-4 w-4" />
                           <span>Duration</span>
                         </div>
-                        <p className="font-medium text-gray-900">{option.duration}</p>
+                        <p className={`font-medium ${
+                          option.isBestOption ? 'text-green-800' : 'text-gray-900'
+                        }`}>
+                          {option.duration}
+                        </p>
                       </div>
                       <div>
                         <div className="flex items-center space-x-1 text-sm text-gray-600 mb-1">
                           <IndianRupee className="h-4 w-4" />
                           <span>Cost</span>
                         </div>
-                        <p className="font-medium text-gray-900">{option.cost}</p>
+                        <p className={`font-medium ${
+                          option.isBestOption ? 'text-green-800' : 'text-gray-900'
+                        }`}>
+                          {option.cost}
+                        </p>
                       </div>
                     </div>
 
                     {viewMode === 'tile' && (
                       <div className="space-y-3">
                         <div>
-                          <h5 className="text-sm font-medium text-green-700 mb-1">Pros</h5>
+                          <h5 className={`text-sm font-medium mb-1 ${
+                            option.isBestOption ? 'text-green-800' : 'text-green-700'
+                          }`}>
+                            Pros
+                          </h5>
                           <ul className="text-xs text-gray-600 space-y-1">
                             {option.pros.map((pro: string, i: number) => (
                               <li key={i} className="flex items-center space-x-1">
-                                <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+                                <div className={`w-1 h-1 rounded-full ${
+                                  option.isBestOption ? 'bg-green-600' : 'bg-green-500'
+                                }`}></div>
                                 <span>{pro}</span>
                               </li>
                             ))}
@@ -806,10 +904,49 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                         </div>
                       </div>
                     )}
+
+                    {/* Best Option Call-to-Action */}
+                    {option.isBestOption && (
+                      <div className="mt-4 pt-3 border-t border-green-200">
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-green-700">
+                            <span className="font-medium">Why this is recommended:</span>
+                            <p className="mt-1">
+                              {option.score >= 90 ? 'Optimal for your route with best time-cost balance' :
+                               option.score >= 85 ? 'Great choice considering distance and comfort' :
+                               'Good option with reasonable trade-offs'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
+
+            {/* Recommendation Summary */}
+            {travelRecommendations.length > 0 && (
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-100 p-2 rounded-lg">
+                    <Lightbulb className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-blue-900 mb-2">Smart Recommendation</h4>
+                    <p className="text-sm text-blue-800 mb-2">
+                      Based on your route from <span className="font-medium">{fromDestination}</span> to <span className="font-medium">{toDestination}</span>, 
+                      we've analyzed factors like distance, cost, comfort, and convenience to recommend the best travel option.
+                    </p>
+                    <div className="text-xs text-blue-700 space-y-1">
+                      <p>• <strong>Distance:</strong> {isLongDistanceRoute(fromDestination, toDestination) ? 'Long distance' : isShortDistanceRoute(fromDestination, toDestination) ? 'Short distance' : 'Medium distance'}</p>
+                      <p>• <strong>Recommendation:</strong> Look for the ⭐ RECOMMENDED option for the best overall experience</p>
+                      <p>• <strong>Score:</strong> Higher scores indicate better suitability for your specific journey</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Top Activities Section */}
