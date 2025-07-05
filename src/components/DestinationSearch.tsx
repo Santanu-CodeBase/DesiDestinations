@@ -849,34 +849,89 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <h4 className="font-medium text-blue-900 mb-3">Quick Booking Links:</h4>
             <div className="flex flex-wrap gap-3">
-              <a
-                href="https://www.irctc.co.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
-              >
-                <Train className="h-4 w-4" />
-                <span>IRCTC (Trains)</span>
-              </a>
-              <a
-                href="https://www.redbus.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
-              >
-                <Bus className="h-4 w-4" />
-                <span>RedBus (Buses)</span>
-              </a>
-              <a
-                href="https://www.goindigo.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm"
-              >
-                <Plane className="h-4 w-4" />
-                <span>IndiGo (Flights)</span>
-              </a>
+              {/* Flight Booking Links */}
+              {searchResults.some(option => option.mode === 'Flight') && (
+                <>
+                  <a
+                    href={Math.random() > 0.5 ? "https://www.goindigo.in" : "https://www.airindia.in"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm"
+                  >
+                    <Plane className="h-4 w-4" />
+                    <span>{Math.random() > 0.5 ? 'IndiGo' : 'Air India'} (Flights)</span>
+                  </a>
+                  {Math.random() > 0.7 && (
+                    <a
+                      href="https://www.spicejet.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm"
+                    >
+                      <Plane className="h-4 w-4" />
+                      <span>SpiceJet (Flights)</span>
+                    </a>
+                  )}
+                </>
+              )}
+              
+              {/* Train Booking Links */}
+              {searchResults.some(option => option.mode === 'Train') && (
+                <a
+                  href="https://www.irctc.co.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                >
+                  <Train className="h-4 w-4" />
+                  <span>IRCTC (Trains)</span>
+                </a>
+              )}
+              
+              {/* Bus Booking Links */}
+              {searchResults.some(option => option.mode === 'Bus') && (
+                <>
+                  <a
+                    href={Math.random() > 0.5 ? "https://www.redbus.in" : "https://www.abhibus.com"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
+                  >
+                    <Bus className="h-4 w-4" />
+                    <span>{Math.random() > 0.5 ? 'RedBus' : 'AbhiBus'} (Buses)</span>
+                  </a>
+                  {Math.random() > 0.6 && (
+                    <a
+                      href="https://www.irctc.co.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    >
+                      <Bus className="h-4 w-4" />
+                      <span>IRCTC (Buses)</span>
+                    </a>
+                  )}
+                </>
+              )}
+              
+              {/* Car/Road Booking Links */}
+              {searchResults.some(option => option.mode === 'Car/Road') && (
+                <>
+                  <a
+                    href={Math.random() > 0.5 ? "https://www.zoomcar.com" : "https://www.mychoize.com"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm"
+                  >
+                    <Car className="h-4 w-4" />
+                    <span>{Math.random() > 0.5 ? 'Zoomcar' : 'MyChoize'} (Car Rental)</span>
+                  </a>
+                </>
+              )}
             </div>
+            <p className="text-xs text-blue-700 mt-2">
+              🎯 <strong>Smart Booking:</strong> Links are customized based on your selected travel options for better experience!
+            </p>
           </div>
         </div>
       )}
