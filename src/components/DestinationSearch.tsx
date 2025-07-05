@@ -116,9 +116,12 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Source */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Source
-              </label>
+              <div className="flex items-center justify-between mb-2 h-8">
+                <label className="block text-sm font-medium text-gray-700">
+                  Source
+                </label>
+                <div className="w-16"></div> {/* Spacer to match destination layout */}
+              </div>
               <div className="relative">
                 {fromDestination ? (
                   <div className="flex items-center justify-between p-3 border border-gray-300 rounded-lg bg-green-50 border-green-300">
@@ -173,7 +176,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
             {/* Destination */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-2 h-8">
                 <label className="block text-sm font-medium text-gray-700">
                   Destination
                 </label>
