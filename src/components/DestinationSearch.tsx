@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Plus, X, Star, ArrowRight, Plane, Train, Bus, Car, Clock, IndianRupee, Route, Grid, List, Camera, Mountain, Waves, TreePine, Building, Utensils } from 'lucide-react';
+import { Search, Calendar, MapPin, Plus, X, Star, Info, Lightbulb } from 'lucide-react';
 import Logo from './Logo';
 import { indianDestinations } from '../data/destinations';
 import { SearchRecord } from '../types';
@@ -18,6 +18,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [showSmartTips, setShowSmartTips] = useState(false);
   const [travelRecommendations, setTravelRecommendations] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'row' | 'tile'>('row');
   const [destinationActivities, setDestinationActivities] = useState<any>({});
@@ -465,6 +466,16 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
     setEndDate('');
   };
 
+  const smartTravelTips = [
+    "🎯 Book accommodations 2-3 months in advance for better rates",
+    "🌤️ Check weather patterns and pack accordingly for each destination", 
+    "🚂 Consider train travel between cities for authentic Indian experience",
+    "💰 Keep cash handy as many local vendors prefer cash payments",
+    "📱 Download offline maps and translation apps before traveling",
+    "🍛 Try local street food but ensure it's from busy, hygienic stalls",
+    "🎫 Book popular attractions online to skip long queues",
+    "🧳 Pack light and leave room for souvenirs and local purchases"
+  ];
   const popularDestinations = ['Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Tamil Nadu', 'Karnataka', 'Uttarakhand', 'Maharashtra'];
 
   return (
@@ -677,20 +688,105 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
 
       {/* Popular Destinations */}
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+            <Star className="h-5 w-5 text-orange-600 mr-2" />
+            Popular Destinations
+          </h3>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {['Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Tamil Nadu', 'Karnataka', 'Uttarakhand', 'Maharashtra'].map(dest => (
+            <button
+              key={dest}
+              onClick={() => handleDestinationSelect(dest)}
+              className="p-3 text-center bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200 hover:border-orange-300"
+            >
+              <span className="text-sm font-medium text-orange-700">{dest}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Travel Options with Smart Tips Icon */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+            <MapPin className="h-5 w-5 text-orange-600 mr-2" />
+            Travel Options
+            <div className="relative ml-2">
+              <button
+                onMouseEnter={() => setShowSmartTips(true)}
+                onMouseLeave={() => setShowSmartTips(false)}
+                onClick={() => setShowSmartTips(!showSmartTips)}
+                className="p-1 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+                title="Smart Travel Tips"
+              >
+                <Lightbulb className="h-4 w-4 text-blue-600" />
+              </button>
+              
+              {/* Smart Tips Tooltip */}
+              {showSmartTips && (
+                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-4">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Lightbulb className="h-5 w-5 text-blue-600" />
+                    <h4 className="font-semibold text-gray-900">Smart Travel Tips</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {smartTravelTips.map((tip, index) => (
+                      <div key={index} className="text-sm text-gray-700 flex items-start space-x-2">
+                        <span className="text-blue-500 font-medium">•</span>
+                        <span>{tip}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-xs text-gray-500 italic">💡 Pro tips for a memorable Indian journey</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h4 className="font-medium text-blue-900 mb-2">🚂 Train Travel</h4>
+            <p className="text-sm text-blue-700">Experience India's extensive railway network with comfortable and affordable train journeys.</p>
+          </div>
+          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+            <h4 className="font-medium text-green-900 mb-2">✈️ Flight Options</h4>
+            <p className="text-sm text-green-700">Quick and convenient air travel between major cities and tourist destinations.</p>
+          </div>
+          <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+            <h4 className="font-medium text-purple-900 mb-2">🚌 Bus Services</h4>
+            <p className="text-sm text-purple-700">Economical bus travel with various comfort levels for budget-conscious travelers.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Travel Information */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
           <Star className="h-5 w-5 text-orange-600 mr-2" />
-          {fromDestination && toDestination ? 'Travel Recommendations' : 'Popular Destinations'}
+          Travel Recommendations
         </h3>
-        
-        {fromDestination && toDestination ? (
-          // Travel Recommendations
-          <div className="space-y-6">
-            {/* View Toggle - Top Position */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <h4 className="text-lg font-semibold text-gray-900">Travel Options</h4>
-                <span className="text-sm text-gray-500">
-                  {fromDestination} → {toDestination}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-900">🏛️ Cultural Experiences</h4>
+            <ul className="text-sm text-gray-700 space-y-1">
+              <li>• Visit ancient temples and historical monuments</li>
+              <li>• Attend local festivals and cultural events</li>
+              <li>• Experience traditional dance and music performances</li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-900">🍛 Culinary Adventures</h4>
+            <ul className="text-sm text-gray-700 space-y-1">
+              <li>• Try regional specialties and street food</li>
+              <li>• Take cooking classes to learn local recipes</li>
+              <li>• Visit spice markets and tea plantations</li>
+            </ul>
+          </div>
                 </span>
               </div>
               
