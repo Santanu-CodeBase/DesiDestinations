@@ -706,25 +706,12 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                         className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                           viewMode === 'row'
                             ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-green-100">
                         }`}
                       >
                         Row View
                       </button>
                       <button
-                        onClick={() => setViewMode('tile')}
-                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                          viewMode === 'tile'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                      >
-                        Tile View
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               {/* Route Summary */}
               <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
@@ -1065,51 +1052,67 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                         </div>
                       </div>
                     </div>
+            {/* Side by side layout for Travel Options and Top Activities */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Travel Options */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <h4 className="text-lg font-medium text-gray-800">Travel Options</h4>
+                  <div className="group relative">
+                    <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center cursor-help">
+                      <span className="text-xs font-bold text-blue-600">i</span>
+                    </div>
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                      💡 Book early for better prices • 🎯 Compare options • ⭐ Check reviews
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {travelRecommendations.travelOptions.map((option, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <option.icon className="h-5 w-5 text-blue-600" />
+                        <h5 className="font-medium text-gray-900">{option.type}</h5>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{option.description}</p>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="flex items-center text-gray-500">
+                          <Clock className="h-4 w-4 mr-1" />
+                          {option.duration}
+                        </span>
+                        <span className="flex items-center text-green-600 font-medium">
+                          <IndianRupee className="h-4 w-4 mr-1" />
+                          {option.cost}
+                        </span>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
-        ) : (
-          // Popular Destinations Selection
-          <div className="space-y-4">
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for Source:</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {popularDestinations.map(dest => (
-                <button
-                  key={`source-${dest}`}
-                  onClick={() => handleFromDestinationSelect(dest)}
-                  className={`p-2 text-center rounded-lg transition-colors border text-sm ${
-                    fromDestination === dest
-                      ? 'bg-green-100 border-green-300 text-green-700'
-                      : 'bg-green-50 hover:bg-green-100 border-green-200 hover:border-green-300 text-green-600'
-                  }`}
-                >
-                  {dest}
-                </button>
-              ))}
+
+              {/* Top Activities */}
+              <div>
+                <h4 className="text-lg font-medium text-gray-800 mb-4">Top Activities at Your Destinations</h4>
+                <div className="space-y-4">
+                  {Object.entries(travelRecommendations.activities).map(([destination, activities]) => (
+                    <div key={destination} className="border border-gray-200 rounded-lg p-4">
+                      <h5 className="font-medium text-gray-900 mb-3 flex items-center">
+                        <MapPin className="h-4 w-4 text-orange-600 mr-2" />
+                        {destination}
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {activities.map((activity, index) => (
+                          <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                            <activity.icon className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm text-gray-700">{activity.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-          
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for Destination:</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {popularDestinations.map(dest => (
-                <button
-                  key={`destination-${dest}`}
-                  onClick={() => handleToDestinationSelect(dest)}
-                  className={`p-2 text-center rounded-lg transition-colors border text-sm ${
-                    toDestination === dest
-                      ? 'bg-blue-100 border-blue-300 text-blue-700'
-                      : 'bg-blue-50 hover:bg-blue-100 border-blue-200 hover:border-blue-300 text-blue-600'
-                  }`}
-                >
-                  {dest}
-                </button>
-              ))}
-            </div>
-          </div>
           </div>
         )}
       </div>
