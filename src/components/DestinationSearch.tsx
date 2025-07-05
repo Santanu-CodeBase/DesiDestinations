@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar, MapPin, Plus, X, Star, ArrowRight, Plane, Train, Bus, Car, Clock, IndianRupee, Route, Grid, List, Camera, Mountain, Waves, TreePine, Building, Utensils } from 'lucide-react';
+import { Search, Calendar, MapPin, Plus, X, Star, Train, Plane, Bus, Car, Lightbulb, Info } from 'lucide-react';
 import Logo from './Logo';
 import { indianDestinations } from '../data/destinations';
 import { SearchRecord } from '../types';
