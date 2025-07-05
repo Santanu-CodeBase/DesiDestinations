@@ -171,23 +171,23 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
               </div>
             </div>
 
-            {/* Swap Button for Mobile */}
-            <div className="lg:hidden flex justify-center">
-              <button
-                onClick={swapDestinations}
-                disabled={!fromDestination || !toDestination}
-                className="p-2 rounded-full bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                title="Swap destinations"
-              >
-                <ArrowRight className="h-5 w-5 transform rotate-90" />
-              </button>
-            </div>
-
             {/* Destination */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Destination
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Destination
+                </label>
+                <button
+                  onClick={swapDestinations}
+                  disabled={!fromDestination || !toDestination}
+                  className="flex items-center space-x-1 px-3 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                  title="Swap destinations"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                  <span className="font-medium">Swap</span>
+                  <ArrowRight className="h-4 w-4 transform rotate-180" />
+                </button>
+              </div>
               <div className="relative">
                 {toDestination ? (
                   <div className="flex items-center justify-between p-3 border border-gray-300 rounded-lg bg-blue-50 border-blue-300">
@@ -239,20 +239,6 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
                 )}
               </div>
             </div>
-          </div>
-
-          {/* Swap Button for Desktop */}
-          <div className="hidden lg:flex justify-center">
-            <button
-              onClick={swapDestinations}
-              disabled={!fromDestination || !toDestination}
-              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title="Swap destinations"
-            >
-              <ArrowRight className="h-4 w-4" />
-              <span className="text-sm font-medium">Swap</span>
-              <ArrowRight className="h-4 w-4 transform rotate-180" />
-            </button>
           </div>
 
           {/* Journey Summary */}
