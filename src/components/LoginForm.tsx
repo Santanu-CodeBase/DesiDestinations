@@ -184,7 +184,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       }
 
       if (userData.password !== password) {
-        setPasswordError('Incorrect password. Please check and try again.');
+        setPasswordError('Incorrect userid /password. Please check and try again.');
         setIsLoading(false);
         return;
       }
