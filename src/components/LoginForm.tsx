@@ -34,6 +34,12 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   // Reset password state
   const [resetEmail, setResetEmail] = useState('');
   const [resetLinkSent, setResetLinkSent] = useState(false);
+  const [resetToken, setResetToken] = useState<string | null>(null);
+  const [tokenExpiry, setTokenExpiry] = useState<Date | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   // Error states
   const [passwordError, setPasswordError] = useState('');
@@ -63,7 +69,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       description: 'Marvel at the pristine white marble mausoleum, an architectural masterpiece and UNESCO World Heritage Site that stands as an eternal symbol of love'
     },
     {
-      url: 'https://images.pexels.com/photos/2413613/pexels-photo-2413613.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Kerala Backwaters - God\'s Own Country',
       description: 'Drift through tranquil backwaters on traditional houseboats, surrounded by emerald paddy fields and swaying coconut palms in Kerala\'s pristine waterways'
     },
@@ -73,12 +79,12 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       description: 'Experience the mystical beauty of the Thar Desert with endless golden sand dunes, camel safaris, and magical starlit nights in Rajasthan\'s royal landscape'
     },
     {
-      url: 'https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Himalayas - Crown of the World',
       description: 'Stand in awe of majestic snow-capped peaks that pierce the sky, offering breathtaking views and spiritual serenity in the world\'s highest mountain range'
     },
     {
-      url: 'https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      url: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       caption: 'Goa Beaches - Coastal Paradise',
       description: 'Relax on pristine golden beaches where palm trees sway gently and crystal-clear waters meet the shore, creating the perfect tropical paradise'
     }
@@ -115,9 +121,13 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
   // Clear form data
   const clearForm = () => {
     setPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
     setName('');
     setPhone('');
     setShowPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
     clearErrors();
   };
 
@@ -184,7 +194,7 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
       }
 
       if (userData.password !== password) {
-        setPasswordError('Incorrect password. Please check and try again.');
+        setPasswordError('Incorrect user id / password. Please check and try again.');
         setIsLoading(false);
         return;
       }
@@ -288,26 +298,43 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     clearErrors();
     
     if (!resetEmail.trim()) {
+      setEmailError('Email is required');
       return;
     }
 
     if (!validateEmail(resetEmail)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    // Check if user exists
+    const cleanEmail = resetEmail.trim().toLowerCase();
+    const userData = getUserData(cleanEmail);
+    
+    if (!userData) {
+      setPasswordError('No account found with this email address.');
+      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     
-    // Simulate sending reset email
+    // Generate reset token and expiry (15 minutes)
     await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const token = `reset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+    
+    // Store reset token with expiry
+    localStorage.setItem(`reset_token_${cleanEmail}`, JSON.stringify({
+      token,
+      expiry: expiry.toISOString(),
+      email: cleanEmail
+    }));
     
     setResetLinkSent(true);
     setIsLoading(false);
-    
-    // Auto-return to login after 5 seconds
-    setTimeout(() => {
-      setResetLinkSent(false);
-      switchToMode('login');
-    }, 5000);
+    clearErrors(); // Clear any previous errors
   };
 
   // Switch between different modes
@@ -315,7 +342,117 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
     clearForm();
     setResetEmail('');
     setResetLinkSent(false);
+    setResetToken(null);
+    setTokenExpiry(null);
+    setNewPassword('');
+    setConfirmPassword('');
     setMode(newMode);
+  };
+
+  // Handle using the reset link
+  const handleUseResetLink = () => {
+    const cleanEmail = resetEmail.trim().toLowerCase();
+    const resetData = localStorage.getItem(`reset_token_${cleanEmail}`);
+    
+    if (!resetData) {
+      setPasswordError('Reset link not found. Please generate a new one.');
+      return;
+    }
+    
+    try {
+      const { token, expiry } = JSON.parse(resetData);
+      const expiryDate = new Date(expiry);
+      
+      if (new Date() > expiryDate) {
+        localStorage.removeItem(`reset_token_${cleanEmail}`);
+        setPasswordError('Reset link has expired. Please generate a new one.');
+        setResetLinkSent(false);
+        return;
+      }
+      
+      setResetToken(token);
+      setTokenExpiry(expiryDate);
+      setNewPassword('');
+      setConfirmPassword('');
+      clearErrors();
+    } catch (error) {
+      setPasswordError('Invalid reset link. Please generate a new one.');
+    }
+  };
+
+  // Handle password reset submission
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
+    
+    // Validate passwords
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    
+    // Check if token is still valid
+    if (!tokenExpiry || new Date() > tokenExpiry) {
+      setPasswordError('Reset link has expired. Please request a new one.');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const cleanEmail = resetEmail.trim().toLowerCase();
+      const userData = getUserData(cleanEmail);
+      
+      if (!userData) {
+        setPasswordError('User account not found.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Update password
+      const updatedUserData = {
+        ...userData,
+        password: newPassword,
+        lastPasswordReset: new Date().toISOString()
+      };
+      
+      const saved = saveUserData(updatedUserData);
+      if (!saved) {
+        setPasswordError('Failed to update password. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Clean up reset token
+      localStorage.removeItem(`reset_token_${cleanEmail}`);
+      
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Auto-login with new password
+      localStorage.setItem('desiDestinationsEmail', cleanEmail);
+      onLogin(cleanEmail);
+      
+    } catch (error) {
+      console.error('Password reset error:', error);
+      setPasswordError('An error occurred while resetting password. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  // Handle clearing password error when switching back to email input
+  const handleBackToEmailInput = () => {
+    setResetLinkSent(false);
+    setResetToken(null);
+    setTokenExpiry(null);
+    setNewPassword('');
+    setConfirmPassword('');
+    clearErrors();
   };
 
   // Handle proceeding to registration from user not found dialog
@@ -399,10 +536,24 @@ const LoginFormContainer: React.FC<LoginFormContainerProps> = ({ onLogin }) => {
               <ForgotPasswordForm
                 resetEmail={resetEmail}
                 resetLinkSent={resetLinkSent}
+                resetToken={resetToken}
+                newPassword={newPassword}
+                confirmPassword={confirmPassword}
+                showNewPassword={showNewPassword}
+                showConfirmPassword={showConfirmPassword}
+                passwordError={passwordError}
+                emailError={emailError}
+                tokenExpiry={tokenExpiry}
                 isLoading={isLoading}
                 onEmailChange={setResetEmail}
+                onNewPasswordChange={setNewPassword}
+                onConfirmPasswordChange={setConfirmPassword}
+                onToggleNewPassword={() => setShowNewPassword(!showNewPassword)}
+                onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
                 onSubmit={handleForgotPassword}
-                onBackToLogin={() => switchToMode('login')}
+                onResetPassword={handleResetPassword}
+                onUseResetLink={handleUseResetLink}
+                onBackToLogin={resetToken ? handleBackToEmailInput : () => switchToMode('login')}
               />
             )}
 
