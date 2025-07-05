@@ -316,7 +316,7 @@ const DataCleanupPanel: React.FC = () => {
           <div className="text-sm text-yellow-800">
             <strong>Critical Warning:</strong> These actions will permanently remove ALL user accounts, 
             making it impossible for anyone to login. The app will restart with a completely clean database. 
-            Use "COMPLETE RESET & RESTART" for guaranteed clean slate.
+            Use "COMPLETE RESET & RESTART\" for guaranteed clean slate.
           </div>
         </div>
       </div>
