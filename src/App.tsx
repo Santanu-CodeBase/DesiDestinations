@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, MapPin, Calendar, Bell, History, Mic, Settings } from 'lucide-react';
 import Logo from './components/Logo';
 import LoginForm from './components/LoginForm';
+import SimpleReset from './components/SimpleReset';
 import DestinationSearch from './components/DestinationSearch';
 import SearchHistory from './components/SearchHistory';
 import NotificationCenter from './components/NotificationCenter';
@@ -18,6 +19,7 @@ function App() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showReset, setShowReset] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -90,6 +92,18 @@ function App() {
 
   // Check for admin access (simple check - in production use proper auth)
   const isAdmin = userEmail === 'admin@desidestinations.com';
+
+  // Show reset panel if requested via URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('reset') === 'true') {
+      setShowReset(true);
+    }
+  }, []);
+
+  if (showReset) {
+    return <SimpleReset />;
+  }
 
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
