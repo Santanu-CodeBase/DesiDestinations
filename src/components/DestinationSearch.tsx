@@ -331,7 +331,7 @@ const DestinationSearch: React.FC<DestinationSearchProps> = ({ onSearchComplete 
         </h3>
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for From destination:</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Quick select for From:</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {popularDestinations.map(dest => (
                 <button
